@@ -14,7 +14,390 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      compliance_frameworks: {
+        Row: {
+          enabled_at: string
+          framework: Database["public"]["Enums"]["framework_type"]
+          id: string
+          is_primary: boolean | null
+          organization_id: string
+        }
+        Insert: {
+          enabled_at?: string
+          framework: Database["public"]["Enums"]["framework_type"]
+          id?: string
+          is_primary?: boolean | null
+          organization_id: string
+        }
+        Update: {
+          enabled_at?: string
+          framework?: Database["public"]["Enums"]["framework_type"]
+          id?: string
+          is_primary?: boolean | null
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "compliance_frameworks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      control_test_results: {
+        Row: {
+          evidence: Json | null
+          failure_reason: string | null
+          id: string
+          organization_control_id: string
+          remediation_recommendation: string | null
+          status: Database["public"]["Enums"]["control_status"]
+          tested_at: string
+        }
+        Insert: {
+          evidence?: Json | null
+          failure_reason?: string | null
+          id?: string
+          organization_control_id: string
+          remediation_recommendation?: string | null
+          status: Database["public"]["Enums"]["control_status"]
+          tested_at?: string
+        }
+        Update: {
+          evidence?: Json | null
+          failure_reason?: string | null
+          id?: string
+          organization_control_id?: string
+          remediation_recommendation?: string | null
+          status?: Database["public"]["Enums"]["control_status"]
+          tested_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "control_test_results_organization_control_id_fkey"
+            columns: ["organization_control_id"]
+            isOneToOne: false
+            referencedRelation: "organization_controls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      controls: {
+        Row: {
+          category: string
+          control_id: string
+          created_at: string
+          description: string | null
+          framework: Database["public"]["Enums"]["framework_type"]
+          id: string
+          name: string
+          severity: Database["public"]["Enums"]["risk_level"]
+          test_frequency_minutes: number
+        }
+        Insert: {
+          category: string
+          control_id: string
+          created_at?: string
+          description?: string | null
+          framework: Database["public"]["Enums"]["framework_type"]
+          id?: string
+          name: string
+          severity?: Database["public"]["Enums"]["risk_level"]
+          test_frequency_minutes?: number
+        }
+        Update: {
+          category?: string
+          control_id?: string
+          created_at?: string
+          description?: string | null
+          framework?: Database["public"]["Enums"]["framework_type"]
+          id?: string
+          name?: string
+          severity?: Database["public"]["Enums"]["risk_level"]
+          test_frequency_minutes?: number
+        }
+        Relationships: []
+      }
+      evidence_sources: {
+        Row: {
+          connection_config: Json
+          created_at: string
+          id: string
+          is_active: boolean | null
+          last_collection_at: string | null
+          name: string
+          organization_id: string
+          source_type: string
+        }
+        Insert: {
+          connection_config?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_collection_at?: string | null
+          name: string
+          organization_id: string
+          source_type: string
+        }
+        Update: {
+          connection_config?: Json
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          last_collection_at?: string | null
+          name?: string
+          organization_id?: string
+          source_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "evidence_sources_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      maturity_assessments: {
+        Row: {
+          assessed_at: string
+          domain_scores: Json
+          id: string
+          improvement_recommendations: Json | null
+          organization_id: string
+          overall_level: Database["public"]["Enums"]["maturity_level"]
+          projected_risk_reduction: number | null
+        }
+        Insert: {
+          assessed_at?: string
+          domain_scores?: Json
+          id?: string
+          improvement_recommendations?: Json | null
+          organization_id: string
+          overall_level: Database["public"]["Enums"]["maturity_level"]
+          projected_risk_reduction?: number | null
+        }
+        Update: {
+          assessed_at?: string
+          domain_scores?: Json
+          id?: string
+          improvement_recommendations?: Json | null
+          organization_id?: string
+          overall_level?: Database["public"]["Enums"]["maturity_level"]
+          projected_risk_reduction?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "maturity_assessments_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organization_controls: {
+        Row: {
+          control_id: string
+          created_at: string
+          current_status: Database["public"]["Enums"]["control_status"]
+          id: string
+          is_enabled: boolean | null
+          last_tested_at: string | null
+          organization_id: string
+          pass_rate: number | null
+          risk_weight: number | null
+          updated_at: string
+        }
+        Insert: {
+          control_id: string
+          created_at?: string
+          current_status?: Database["public"]["Enums"]["control_status"]
+          id?: string
+          is_enabled?: boolean | null
+          last_tested_at?: string | null
+          organization_id: string
+          pass_rate?: number | null
+          risk_weight?: number | null
+          updated_at?: string
+        }
+        Update: {
+          control_id?: string
+          created_at?: string
+          current_status?: Database["public"]["Enums"]["control_status"]
+          id?: string
+          is_enabled?: boolean | null
+          last_tested_at?: string | null
+          organization_id?: string
+          pass_rate?: number | null
+          risk_weight?: number | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "organization_controls_control_id_fkey"
+            columns: ["control_id"]
+            isOneToOne: false
+            referencedRelation: "controls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organization_controls_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      organizations: {
+        Row: {
+          baseline_risk_exposure: number | null
+          created_at: string
+          current_maturity_level: Database["public"]["Enums"]["maturity_level"]
+          current_risk_exposure: number | null
+          id: string
+          industry: string
+          name: string
+          size: string
+          updated_at: string
+        }
+        Insert: {
+          baseline_risk_exposure?: number | null
+          created_at?: string
+          current_maturity_level?: Database["public"]["Enums"]["maturity_level"]
+          current_risk_exposure?: number | null
+          id?: string
+          industry: string
+          name: string
+          size: string
+          updated_at?: string
+        }
+        Update: {
+          baseline_risk_exposure?: number | null
+          created_at?: string
+          current_maturity_level?: Database["public"]["Enums"]["maturity_level"]
+          current_risk_exposure?: number | null
+          id?: string
+          industry?: string
+          name?: string
+          size?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      risk_calculations: {
+        Row: {
+          calculated_at: string
+          calculation_details: Json | null
+          compliance_score: number
+          control_pass_rate: number
+          id: string
+          maturity_level: Database["public"]["Enums"]["maturity_level"]
+          organization_id: string
+          projected_risk_exposure: number | null
+          total_risk_exposure: number
+        }
+        Insert: {
+          calculated_at?: string
+          calculation_details?: Json | null
+          compliance_score: number
+          control_pass_rate: number
+          id?: string
+          maturity_level: Database["public"]["Enums"]["maturity_level"]
+          organization_id: string
+          projected_risk_exposure?: number | null
+          total_risk_exposure: number
+        }
+        Update: {
+          calculated_at?: string
+          calculation_details?: Json | null
+          compliance_score?: number
+          control_pass_rate?: number
+          id?: string
+          maturity_level?: Database["public"]["Enums"]["maturity_level"]
+          organization_id?: string
+          projected_risk_exposure?: number | null
+          total_risk_exposure?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "risk_calculations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      threat_scenarios: {
+        Row: {
+          annual_loss_exposure: number | null
+          asset_at_risk: string
+          created_at: string
+          description: string | null
+          id: string
+          loss_event_frequency: number | null
+          mitigating_control_ids: string[] | null
+          name: string
+          organization_id: string
+          primary_loss_magnitude: number
+          risk_level: Database["public"]["Enums"]["risk_level"]
+          secondary_loss_magnitude: number
+          threat_event_frequency: number
+          threat_type: string
+          updated_at: string
+          vulnerability_factor: number
+        }
+        Insert: {
+          annual_loss_exposure?: number | null
+          asset_at_risk: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          loss_event_frequency?: number | null
+          mitigating_control_ids?: string[] | null
+          name: string
+          organization_id: string
+          primary_loss_magnitude?: number
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          secondary_loss_magnitude?: number
+          threat_event_frequency?: number
+          threat_type: string
+          updated_at?: string
+          vulnerability_factor?: number
+        }
+        Update: {
+          annual_loss_exposure?: number | null
+          asset_at_risk?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          loss_event_frequency?: number | null
+          mitigating_control_ids?: string[] | null
+          name?: string
+          organization_id?: string
+          primary_loss_magnitude?: number
+          risk_level?: Database["public"]["Enums"]["risk_level"]
+          secondary_loss_magnitude?: number
+          threat_event_frequency?: number
+          threat_type?: string
+          updated_at?: string
+          vulnerability_factor?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threat_scenarios_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +406,17 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      control_status: "pass" | "fail" | "warning" | "not_tested"
+      framework_type:
+        | "nist_csf"
+        | "iso_27001"
+        | "soc2"
+        | "cis"
+        | "cobit"
+        | "hipaa"
+        | "pci_dss"
+      maturity_level: "level_1" | "level_2" | "level_3" | "level_4" | "level_5"
+      risk_level: "critical" | "high" | "medium" | "low"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +543,19 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      control_status: ["pass", "fail", "warning", "not_tested"],
+      framework_type: [
+        "nist_csf",
+        "iso_27001",
+        "soc2",
+        "cis",
+        "cobit",
+        "hipaa",
+        "pci_dss",
+      ],
+      maturity_level: ["level_1", "level_2", "level_3", "level_4", "level_5"],
+      risk_level: ["critical", "high", "medium", "low"],
+    },
   },
 } as const
