@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   LayoutDashboard,
   Shield,
@@ -11,8 +11,11 @@ import {
   Target,
   ChevronLeft,
   ChevronRight,
+  LogOut,
 } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
+import { useToast } from "@/hooks/use-toast";
 
 interface NavItem {
   label: string;
@@ -37,7 +40,27 @@ const bottomNavItems: NavItem[] = [
 
 export function AppSidebar() {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { profile, signOut } = useAuth();
+  const { toast } = useToast();
   const [collapsed, setCollapsed] = useState(false);
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign out failed',
+        description: error.message,
+      });
+    } else {
+      navigate('/auth');
+    }
+  };
+
+  const initials = profile?.full_name
+    ? profile.full_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'U';
 
   return (
     <aside
@@ -127,15 +150,24 @@ export function AppSidebar() {
           );
         })}
         
+        {/* Sign Out Button */}
+        <button
+          onClick={handleSignOut}
+          className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all duration-200"
+        >
+          <LogOut className="h-5 w-5 shrink-0" />
+          {!collapsed && <span>Sign Out</span>}
+        </button>
+        
         {/* User Profile */}
         {!collapsed && (
           <div className="mt-3 flex items-center gap-3 rounded-lg bg-sidebar-accent/50 p-3">
             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-primary text-sm font-semibold text-primary-foreground">
-              JD
+              {initials}
             </div>
             <div className="flex-1 overflow-hidden">
-              <p className="truncate text-sm font-medium text-foreground">John Doe</p>
-              <p className="truncate text-xs text-muted-foreground">Security Analyst</p>
+              <p className="truncate text-sm font-medium text-foreground">{profile?.full_name || 'User'}</p>
+              <p className="truncate text-xs text-muted-foreground">Research Participant</p>
             </div>
           </div>
         )}
