@@ -1,13 +1,13 @@
 import { cn } from "@/lib/utils";
 import { Shield } from "lucide-react";
 import { useThreatScenarios } from "@/hooks/useThreatScenarios";
+import { useOrganizationContext } from "@/contexts/OrganizationContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { RiskLevel } from "@/types/database";
 
-const DEMO_ORG_ID = 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d';
-
 export function ThreatScenarioCard() {
-  const { data: scenarios, isLoading } = useThreatScenarios(DEMO_ORG_ID);
+  const { organizationId } = useOrganizationContext();
+  const { data: scenarios, isLoading } = useThreatScenarios(organizationId || '');
 
   const getRiskColor = (level: RiskLevel) => {
     switch (level) {

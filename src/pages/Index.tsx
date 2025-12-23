@@ -12,13 +12,12 @@ import {
   Clock,
   TrendingDown,
 } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useTotalRiskExposure, useThreatScenarios } from "@/hooks/useThreatScenarios";
 import { useControlsPassRate, useOrganizationControls } from "@/hooks/useControls";
 import { useLatestMaturityAssessment, calculateProjectedRiskReduction } from "@/hooks/useRiskCalculations";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const DEMO_ORG_ID = 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d';
 
 const formatCurrency = (value: number): string => {
   if (value >= 1000000000) return `$${(value / 1000000000).toFixed(1)}B`;
@@ -39,14 +38,17 @@ const getMaturityNumeric = (level: string): number => {
 };
 
 const Index = () => {
-  const { data: organization, isLoading: orgLoading } = useOrganization(DEMO_ORG_ID);
-  const { data: totalRisk, isLoading: riskLoading } = useTotalRiskExposure(DEMO_ORG_ID);
-  const { data: threats, isLoading: threatsLoading } = useThreatScenarios(DEMO_ORG_ID);
-  const { data: controls, isLoading: controlsLoading } = useOrganizationControls(DEMO_ORG_ID);
-  const { data: passRate, isLoading: passRateLoading } = useControlsPassRate(DEMO_ORG_ID);
-  const { data: maturityAssessment, isLoading: maturityLoading } = useLatestMaturityAssessment(DEMO_ORG_ID);
+  const { profile } = useAuth();
+  const organizationId = profile?.organization_id || '';
+  
+  const { data: organization, isLoading: orgLoading } = useOrganization(organizationId);
+  const { data: totalRisk, isLoading: riskLoading } = useTotalRiskExposure(organizationId);
+  const { data: threats, isLoading: threatsLoading } = useThreatScenarios(organizationId);
+  const { data: controls, isLoading: controlsLoading } = useOrganizationControls(organizationId);
+  const { data: passRate, isLoading: passRateLoading } = useControlsPassRate(organizationId);
+  const { data: maturityAssessment, isLoading: maturityLoading } = useLatestMaturityAssessment(organizationId);
 
-  const isLoading = orgLoading || riskLoading || threatsLoading || controlsLoading || passRateLoading || maturityLoading;
+  const isLoading = !organizationId || orgLoading || riskLoading || threatsLoading || controlsLoading || passRateLoading || maturityLoading;
 
   // Calculate metrics
   const totalControls = controls?.length || 0;

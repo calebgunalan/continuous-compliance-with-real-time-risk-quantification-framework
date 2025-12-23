@@ -4,8 +4,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+import { OrganizationProvider } from "@/contexts/OrganizationContext";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Onboarding from "./pages/Onboarding";
 import ComplianceControls from "./pages/ComplianceControls";
 import RiskQuantification from "./pages/RiskQuantification";
 import MaturityAssessment from "./pages/MaturityAssessment";
@@ -17,20 +19,23 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<Auth />} />
-          <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-          <Route path="/compliance" element={<ProtectedRoute><ComplianceControls /></ProtectedRoute>} />
-          <Route path="/risk" element={<ProtectedRoute><RiskQuantification /></ProtectedRoute>} />
-          <Route path="/maturity" element={<ProtectedRoute><MaturityAssessment /></ProtectedRoute>} />
-          <Route path="/threats" element={<ProtectedRoute><ThreatScenarios /></ProtectedRoute>} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
+      <OrganizationProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/auth" element={<Auth />} />
+            <Route path="/onboarding" element={<ProtectedRoute requiresOrganization={false}><Onboarding /></ProtectedRoute>} />
+            <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
+            <Route path="/compliance" element={<ProtectedRoute><ComplianceControls /></ProtectedRoute>} />
+            <Route path="/risk" element={<ProtectedRoute><RiskQuantification /></ProtectedRoute>} />
+            <Route path="/maturity" element={<ProtectedRoute><MaturityAssessment /></ProtectedRoute>} />
+            <Route path="/threats" element={<ProtectedRoute><ThreatScenarios /></ProtectedRoute>} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </BrowserRouter>
+      </OrganizationProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

@@ -1,14 +1,14 @@
 import { cn } from "@/lib/utils";
 import { CheckCircle2, XCircle, AlertCircle, ChevronRight, HelpCircle } from "lucide-react";
 import { useOrganizationControls } from "@/hooks/useControls";
+import { useOrganizationContext } from "@/contexts/OrganizationContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { formatDistanceToNow } from "date-fns";
 import type { ControlStatus } from "@/types/database";
 
-const DEMO_ORG_ID = 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d';
-
 export function ControlStatusList() {
-  const { data: organizationControls, isLoading } = useOrganizationControls(DEMO_ORG_ID);
+  const { organizationId } = useOrganizationContext();
+  const { data: organizationControls, isLoading } = useOrganizationControls(organizationId || '');
 
   const getStatusIcon = (status: ControlStatus) => {
     switch (status) {

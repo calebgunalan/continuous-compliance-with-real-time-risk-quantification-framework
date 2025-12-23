@@ -1,12 +1,12 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useRiskCalculations } from "@/hooks/useRiskCalculations";
+import { useOrganizationContext } from "@/contexts/OrganizationContext";
 import { Skeleton } from "@/components/ui/skeleton";
 import { format } from "date-fns";
 
-const DEMO_ORG_ID = 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d';
-
 export function RiskExposureChart() {
-  const { data: riskCalculations, isLoading } = useRiskCalculations(DEMO_ORG_ID, 12);
+  const { organizationId } = useOrganizationContext();
+  const { data: riskCalculations, isLoading } = useRiskCalculations(organizationId || '', 12);
 
   // Transform data for chart - show actual data and project future
   const chartData = riskCalculations?.map((calc, index) => ({
