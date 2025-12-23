@@ -53,10 +53,16 @@ export function useAuth() {
       .from('profiles')
       .select('*')
       .eq('id', userId)
-      .single();
+      .maybeSingle();
     
     if (!error && data) {
       setProfile(data as Profile);
+    }
+  };
+
+  const refreshProfile = async () => {
+    if (user?.id) {
+      await fetchProfile(user.id);
     }
   };
 
@@ -97,5 +103,6 @@ export function useAuth() {
     signUp,
     signIn,
     signOut,
+    refreshProfile,
   };
 }

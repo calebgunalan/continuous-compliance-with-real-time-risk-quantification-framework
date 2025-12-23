@@ -1,21 +1,32 @@
 import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
+  requiresOrganization?: boolean;
 }
 
-export function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const { user, loading } = useAuth();
+export function ProtectedRoute({ children, requiresOrganization = true }: ProtectedRouteProps) {
+  const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (!loading && !user) {
       navigate('/auth');
+      return;
     }
-  }, [user, loading, navigate]);
+
+    // If user is authenticated but has no organization and we require one,
+    // redirect to onboarding (unless already on onboarding page)
+    if (!loading && user && profile && requiresOrganization && !profile.organization_id) {
+      if (location.pathname !== '/onboarding') {
+        navigate('/onboarding');
+      }
+    }
+  }, [user, profile, loading, navigate, requiresOrganization, location.pathname]);
 
   if (loading) {
     return (
@@ -29,6 +40,11 @@ export function ProtectedRoute({ children }: ProtectedRouteProps) {
   }
 
   if (!user) {
+    return null;
+  }
+
+  // If we require organization and profile is loaded but no org, don't render children
+  if (requiresOrganization && profile && !profile.organization_id && location.pathname !== '/onboarding') {
     return null;
   }
 
