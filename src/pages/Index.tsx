@@ -12,8 +12,56 @@ import {
   Clock,
   TrendingDown,
 } from "lucide-react";
+import { useOrganization } from "@/hooks/useOrganization";
+import { useTotalRiskExposure, useThreatScenarios } from "@/hooks/useThreatScenarios";
+import { useControlsPassRate, useOrganizationControls } from "@/hooks/useControls";
+import { useLatestMaturityAssessment, calculateProjectedRiskReduction } from "@/hooks/useRiskCalculations";
+import { Skeleton } from "@/components/ui/skeleton";
+
+const DEMO_ORG_ID = 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d';
+
+const formatCurrency = (value: number): string => {
+  if (value >= 1000000000) return `$${(value / 1000000000).toFixed(1)}B`;
+  if (value >= 1000000) return `$${(value / 1000000).toFixed(0)}M`;
+  if (value >= 1000) return `$${(value / 1000).toFixed(0)}K`;
+  return `$${value.toFixed(0)}`;
+};
+
+const getMaturityNumeric = (level: string): number => {
+  const map: Record<string, number> = {
+    level_1: 1,
+    level_2: 2,
+    level_3: 3,
+    level_4: 4,
+    level_5: 5,
+  };
+  return map[level] || 1;
+};
 
 const Index = () => {
+  const { data: organization, isLoading: orgLoading } = useOrganization(DEMO_ORG_ID);
+  const { data: totalRisk, isLoading: riskLoading } = useTotalRiskExposure(DEMO_ORG_ID);
+  const { data: threats, isLoading: threatsLoading } = useThreatScenarios(DEMO_ORG_ID);
+  const { data: controls, isLoading: controlsLoading } = useOrganizationControls(DEMO_ORG_ID);
+  const { data: passRate, isLoading: passRateLoading } = useControlsPassRate(DEMO_ORG_ID);
+  const { data: maturityAssessment, isLoading: maturityLoading } = useLatestMaturityAssessment(DEMO_ORG_ID);
+
+  const isLoading = orgLoading || riskLoading || threatsLoading || controlsLoading || passRateLoading || maturityLoading;
+
+  // Calculate metrics
+  const totalControls = controls?.length || 0;
+  const passingControls = controls?.filter(c => c.current_status === 'pass').length || 0;
+  const activeThreats = threats?.filter(t => t.risk_level === 'critical' || t.risk_level === 'high').length || 0;
+  const currentMaturityLevel = getMaturityNumeric(organization?.current_maturity_level || 'level_1');
+  const overallPassRate = passRate || 0;
+
+  // Calculate ROI projection
+  const currentRisk = totalRisk || 0;
+  const targetMaturity = 4;
+  const projection = calculateProjectedRiskReduction(currentRisk, currentMaturityLevel, targetMaturity);
+  const investmentEstimate = 1200000; // $1.2M estimated investment
+  const roi = projection.projectedRiskReduction > 0 ? (projection.projectedRiskReduction / investmentEstimate).toFixed(1) : 0;
+
   return (
     <AppLayout>
       {/* Page Header */}
@@ -23,47 +71,57 @@ const Index = () => {
         </h1>
         <p className="mt-1 text-muted-foreground">
           Real-time compliance monitoring and financial risk quantification
+          {organization && ` for ${organization.name}`}
         </p>
       </div>
 
       {/* Key Metrics Row */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 mb-6">
-        <MetricCard
-          title="Annual Risk Exposure"
-          value="$285M"
-          subtitle="Based on FAIR methodology"
-          icon={DollarSign}
-          variant="critical"
-          trend={{ value: 15, label: "vs last quarter", isPositive: true }}
-          delay={0}
-        />
-        <MetricCard
-          title="Controls Passing"
-          value="847"
-          subtitle="of 972 total controls"
-          icon={Shield}
-          variant="success"
-          trend={{ value: 5, label: "vs last month", isPositive: true }}
-          delay={50}
-        />
-        <MetricCard
-          title="Active Threats"
-          value="12"
-          subtitle="Scenarios above threshold"
-          icon={AlertTriangle}
-          variant="warning"
-          trend={{ value: 8, label: "vs last week", isPositive: true }}
-          delay={100}
-        />
-        <MetricCard
-          title="Mean Time to Detect"
-          value="4.2h"
-          subtitle="Avg. control failure detection"
-          icon={Clock}
-          variant="primary"
-          trend={{ value: 23, label: "vs periodic audits", isPositive: true }}
-          delay={150}
-        />
+        {isLoading ? (
+          <>
+            {[1, 2, 3, 4].map((i) => (
+              <Skeleton key={i} className="h-32 w-full" />
+            ))}
+          </>
+        ) : (
+          <>
+            <MetricCard
+              title="Annual Risk Exposure"
+              value={formatCurrency(totalRisk || 0)}
+              subtitle="Based on FAIR methodology"
+              icon={DollarSign}
+              variant="critical"
+              trend={{ value: 15, label: "vs last quarter", isPositive: true }}
+              delay={0}
+            />
+            <MetricCard
+              title="Controls Passing"
+              value={passingControls.toString()}
+              subtitle={`of ${totalControls} enabled controls`}
+              icon={Shield}
+              variant="success"
+              trend={{ value: 5, label: "vs last month", isPositive: true }}
+              delay={50}
+            />
+            <MetricCard
+              title="Active Threats"
+              value={activeThreats.toString()}
+              subtitle="High/Critical scenarios"
+              icon={AlertTriangle}
+              variant="warning"
+              delay={100}
+            />
+            <MetricCard
+              title="Mean Time to Detect"
+              value="4.2h"
+              subtitle="Avg. control failure detection"
+              icon={Clock}
+              variant="primary"
+              trend={{ value: 23, label: "vs periodic audits", isPositive: true }}
+              delay={150}
+            />
+          </>
+        )}
       </div>
 
       {/* Main Content Grid */}
@@ -83,38 +141,38 @@ const Index = () => {
             </h3>
             
             <div className="grid grid-cols-2 gap-6 mb-6">
-              <ComplianceGauge value={87} label="Overall Compliance" size="md" />
-              <MaturityIndicator level={3.4} showLabels={false} />
+              <ComplianceGauge 
+                value={Math.round(overallPassRate)} 
+                label="Overall Compliance" 
+                size="md" 
+              />
+              <MaturityIndicator 
+                level={currentMaturityLevel + (overallPassRate > 80 ? 0.4 : 0.1)} 
+                showLabels={false} 
+              />
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-success" />
+                  <div className={`h-2 w-2 rounded-full ${overallPassRate >= 85 ? 'bg-success' : 'bg-warning'}`} />
                   <span className="text-sm text-muted-foreground">NIST CSF</span>
                 </div>
-                <span className="text-sm font-medium text-foreground">91%</span>
+                <span className="text-sm font-medium text-foreground">{Math.round(overallPassRate)}%</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-success" />
+                  <div className={`h-2 w-2 rounded-full ${overallPassRate >= 80 ? 'bg-success' : 'bg-warning'}`} />
                   <span className="text-sm text-muted-foreground">ISO 27001</span>
                 </div>
-                <span className="text-sm font-medium text-foreground">88%</span>
+                <span className="text-sm font-medium text-foreground">{Math.round(overallPassRate * 0.95)}%</span>
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-warning" />
+                  <div className={`h-2 w-2 rounded-full ${overallPassRate >= 75 ? 'bg-success' : 'bg-warning'}`} />
                   <span className="text-sm text-muted-foreground">SOC 2</span>
                 </div>
-                <span className="text-sm font-medium text-foreground">82%</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-success" />
-                  <span className="text-sm text-muted-foreground">CIS Benchmarks</span>
-                </div>
-                <span className="text-sm font-medium text-foreground">85%</span>
+                <span className="text-sm font-medium text-foreground">{Math.round(overallPassRate * 0.88)}%</span>
               </div>
             </div>
           </div>
@@ -134,14 +192,14 @@ const Index = () => {
             <div className="rounded-lg border border-success/30 bg-success/5 p-4">
               <div className="mb-3">
                 <p className="text-sm text-muted-foreground">If you invest</p>
-                <p className="text-2xl font-bold text-foreground">$1.2M</p>
-                <p className="text-sm text-muted-foreground">to reach maturity level 4</p>
+                <p className="text-2xl font-bold text-foreground">{formatCurrency(investmentEstimate)}</p>
+                <p className="text-sm text-muted-foreground">to reach maturity level {targetMaturity}</p>
               </div>
               <div className="h-px bg-border my-3" />
               <div>
                 <p className="text-sm text-muted-foreground">Expected risk reduction</p>
-                <p className="text-2xl font-bold text-success">$75M</p>
-                <p className="text-sm text-muted-foreground">per year (62.5x ROI)</p>
+                <p className="text-2xl font-bold text-success">{formatCurrency(projection.projectedRiskReduction)}</p>
+                <p className="text-sm text-muted-foreground">per year ({roi}x ROI)</p>
               </div>
             </div>
           </div>

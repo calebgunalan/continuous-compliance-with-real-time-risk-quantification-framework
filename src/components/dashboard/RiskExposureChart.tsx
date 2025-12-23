@@ -1,18 +1,30 @@
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useRiskCalculations } from "@/hooks/useRiskCalculations";
+import { Skeleton } from "@/components/ui/skeleton";
+import { format } from "date-fns";
 
-const data = [
-  { month: "Jul", exposure: 450, projected: null },
-  { month: "Aug", exposure: 420, projected: null },
-  { month: "Sep", exposure: 380, projected: null },
-  { month: "Oct", exposure: 340, projected: null },
-  { month: "Nov", exposure: 310, projected: null },
-  { month: "Dec", exposure: 285, projected: null },
-  { month: "Jan", exposure: null, projected: 260 },
-  { month: "Feb", exposure: null, projected: 235 },
-  { month: "Mar", exposure: null, projected: 210 },
-];
+const DEMO_ORG_ID = 'a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d';
 
 export function RiskExposureChart() {
+  const { data: riskCalculations, isLoading } = useRiskCalculations(DEMO_ORG_ID, 12);
+
+  // Transform data for chart - show actual data and project future
+  const chartData = riskCalculations?.map((calc, index) => ({
+    month: format(new Date(calc.calculated_at), 'MMM'),
+    exposure: calc.total_risk_exposure / 1000000, // Convert to millions
+    projected: index >= (riskCalculations.length - 3) ? calc.projected_risk_exposure ? calc.projected_risk_exposure / 1000000 : null : null,
+  })).reverse() || [];
+
+  if (isLoading) {
+    return (
+      <div className="metric-card h-full animate-slide-up" style={{ animationDelay: "200ms" }}>
+        <Skeleton className="h-6 w-48 mb-2" />
+        <Skeleton className="h-4 w-64 mb-6" />
+        <Skeleton className="h-64 w-full" />
+      </div>
+    );
+  }
+
   return (
     <div className="metric-card h-full animate-slide-up" style={{ animationDelay: "200ms" }}>
       <div className="mb-6 flex items-center justify-between">
@@ -33,68 +45,74 @@ export function RiskExposureChart() {
       </div>
 
       <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart
-            data={data}
-            margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
-          >
-            <defs>
-              <linearGradient id="riskGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
-                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-              </linearGradient>
-              <linearGradient id="projectedGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.15} />
-                <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-              </linearGradient>
-            </defs>
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="hsl(var(--border))"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="month"
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-            />
-            <YAxis
-              stroke="hsl(var(--muted-foreground))"
-              fontSize={12}
-              tickLine={false}
-              axisLine={false}
-              tickFormatter={(value) => `$${value}M`}
-            />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--popover))",
-                border: "1px solid hsl(var(--border))",
-                borderRadius: "8px",
-                boxShadow: "var(--shadow-lg)",
-              }}
-              labelStyle={{ color: "hsl(var(--foreground))" }}
-              itemStyle={{ color: "hsl(var(--primary))" }}
-              formatter={(value: number) => [`$${value}M`, "Risk Exposure"]}
-            />
-            <Area
-              type="monotone"
-              dataKey="exposure"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              fill="url(#riskGradient)"
-            />
-            <Area
-              type="monotone"
-              dataKey="projected"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              strokeDasharray="5 5"
-              fill="url(#projectedGradient)"
-            />
-          </AreaChart>
-        </ResponsiveContainer>
+        {chartData.length > 0 ? (
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart
+              data={chartData}
+              margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+            >
+              <defs>
+                <linearGradient id="riskGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="projectedGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.15} />
+                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <CartesianGrid
+                strokeDasharray="3 3"
+                stroke="hsl(var(--border))"
+                vertical={false}
+              />
+              <XAxis
+                dataKey="month"
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+              />
+              <YAxis
+                stroke="hsl(var(--muted-foreground))"
+                fontSize={12}
+                tickLine={false}
+                axisLine={false}
+                tickFormatter={(value) => `$${value.toFixed(0)}M`}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "hsl(var(--popover))",
+                  border: "1px solid hsl(var(--border))",
+                  borderRadius: "8px",
+                  boxShadow: "var(--shadow-lg)",
+                }}
+                labelStyle={{ color: "hsl(var(--foreground))" }}
+                itemStyle={{ color: "hsl(var(--primary))" }}
+                formatter={(value: number) => [`$${value.toFixed(1)}M`, "Risk Exposure"]}
+              />
+              <Area
+                type="monotone"
+                dataKey="exposure"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                fill="url(#riskGradient)"
+              />
+              <Area
+                type="monotone"
+                dataKey="projected"
+                stroke="hsl(var(--primary))"
+                strokeWidth={2}
+                strokeDasharray="5 5"
+                fill="url(#projectedGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        ) : (
+          <div className="flex h-full items-center justify-center text-muted-foreground">
+            No risk calculation data available
+          </div>
+        )}
       </div>
     </div>
   );
