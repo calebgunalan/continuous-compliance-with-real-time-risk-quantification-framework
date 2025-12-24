@@ -12,6 +12,7 @@ import ComplianceControls from "./pages/ComplianceControls";
 import RiskQuantification from "./pages/RiskQuantification";
 import MaturityAssessment from "./pages/MaturityAssessment";
 import ThreatScenarios from "./pages/ThreatScenarios";
+import EvidenceSources from "./pages/EvidenceSources";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -31,6 +32,7 @@ const App = () => (
             <Route path="/risk" element={<ProtectedRoute><RiskQuantification /></ProtectedRoute>} />
             <Route path="/maturity" element={<ProtectedRoute><MaturityAssessment /></ProtectedRoute>} />
             <Route path="/threats" element={<ProtectedRoute><ThreatScenarios /></ProtectedRoute>} />
+            <Route path="/evidence" element={<ProtectedRoute><EvidenceSources /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

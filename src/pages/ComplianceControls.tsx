@@ -1,137 +1,35 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { cn } from "@/lib/utils";
-import { CheckCircle2, XCircle, AlertCircle, Filter, Search, Download } from "lucide-react";
+import { CheckCircle2, XCircle, AlertCircle, Search, Download, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-
-interface Control {
-  id: string;
-  name: string;
-  description: string;
-  framework: string;
-  category: string;
-  status: "pass" | "fail" | "warning";
-  passRate: number;
-  lastChecked: string;
-  testFrequency: string;
-}
-
-const controls: Control[] = [
-  {
-    id: "AC-2",
-    name: "Account Management",
-    description: "Manage system accounts, group memberships, privileges, workflow, notifications, deactivations, and authorizations",
-    framework: "NIST CSF",
-    category: "Access Control",
-    status: "pass",
-    passRate: 98,
-    lastChecked: "2 min ago",
-    testFrequency: "Every 5 min",
-  },
-  {
-    id: "AC-6",
-    name: "Least Privilege",
-    description: "Employ the principle of least privilege, allowing only authorized accesses for users necessary to accomplish assigned tasks",
-    framework: "NIST CSF",
-    category: "Access Control",
-    status: "pass",
-    passRate: 94,
-    lastChecked: "5 min ago",
-    testFrequency: "Every 15 min",
-  },
-  {
-    id: "IA-2",
-    name: "Multi-Factor Authentication",
-    description: "Implement multi-factor authentication for access to privileged and non-privileged accounts",
-    framework: "NIST CSF",
-    category: "Identification & Auth",
-    status: "warning",
-    passRate: 87,
-    lastChecked: "8 min ago",
-    testFrequency: "Every 5 min",
-  },
-  {
-    id: "SI-4",
-    name: "System Monitoring",
-    description: "Monitor the system to detect attacks and indicators of potential attacks and unauthorized connections",
-    framework: "NIST CSF",
-    category: "System Integrity",
-    status: "pass",
-    passRate: 96,
-    lastChecked: "3 min ago",
-    testFrequency: "Continuous",
-  },
-  {
-    id: "A.9.4.1",
-    name: "Information Access Restriction",
-    description: "Access to information and application system functions shall be restricted in accordance with the access control policy",
-    framework: "ISO 27001",
-    category: "Access Control",
-    status: "fail",
-    passRate: 72,
-    lastChecked: "12 min ago",
-    testFrequency: "Every 30 min",
-  },
-  {
-    id: "CM-7",
-    name: "Least Functionality",
-    description: "Configure the system to provide only essential capabilities and prohibit or restrict the use of specified functions",
-    framework: "NIST CSF",
-    category: "Configuration Mgmt",
-    status: "pass",
-    passRate: 91,
-    lastChecked: "6 min ago",
-    testFrequency: "Every 1 hour",
-  },
-  {
-    id: "AU-6",
-    name: "Audit Log Review",
-    description: "Review and analyze system audit logs for indications of inappropriate or unusual activity",
-    framework: "NIST CSF",
-    category: "Audit & Accountability",
-    status: "pass",
-    passRate: 95,
-    lastChecked: "1 min ago",
-    testFrequency: "Continuous",
-  },
-  {
-    id: "SC-8",
-    name: "Transmission Confidentiality",
-    description: "Protect the confidentiality and integrity of transmitted information",
-    framework: "NIST CSF",
-    category: "System Communications",
-    status: "pass",
-    passRate: 99,
-    lastChecked: "4 min ago",
-    testFrequency: "Every 5 min",
-  },
-  {
-    id: "CC6.1",
-    name: "Logical Access Security",
-    description: "Logical access security software, infrastructure, and architectures have been implemented",
-    framework: "SOC 2",
-    category: "Common Criteria",
-    status: "warning",
-    passRate: 84,
-    lastChecked: "15 min ago",
-    testFrequency: "Every 30 min",
-  },
-  {
-    id: "4.1",
-    name: "Secure Configuration",
-    description: "Establish and maintain secure configurations for enterprise assets and software",
-    framework: "CIS Benchmarks",
-    category: "Inventory & Control",
-    status: "pass",
-    passRate: 89,
-    lastChecked: "7 min ago",
-    testFrequency: "Every 1 hour",
-  },
-];
+import { useOrganizationContext } from "@/contexts/OrganizationContext";
+import { useOrganizationControls } from "@/hooks/useControls";
+import { formatDistanceToNow, parseISO } from "date-fns";
+import type { ControlStatus } from "@/types/database";
 
 export default function ComplianceControlsPage() {
+  const { organizationId } = useOrganizationContext();
+  const { data: orgControls, isLoading } = useOrganizationControls(organizationId || "");
+  
   const [filterStatus, setFilterStatus] = useState<"all" | "pass" | "fail" | "warning">("all");
   const [searchQuery, setSearchQuery] = useState("");
+
+  const controls = orgControls?.map(oc => ({
+    id: oc.control?.control_id || oc.id,
+    name: oc.control?.name || "Unknown Control",
+    description: oc.control?.description || "",
+    framework: oc.control?.framework?.replace("_", " ").toUpperCase() || "Unknown",
+    category: oc.control?.category || "General",
+    status: oc.current_status as "pass" | "fail" | "warning",
+    passRate: Number(oc.pass_rate) || 0,
+    lastChecked: oc.last_tested_at 
+      ? formatDistanceToNow(parseISO(oc.last_tested_at), { addSuffix: true })
+      : "Never",
+    testFrequency: oc.control?.test_frequency_minutes 
+      ? `Every ${oc.control.test_frequency_minutes} min`
+      : "Manual",
+  })) || [];
 
   const filteredControls = controls.filter((control) => {
     const matchesStatus = filterStatus === "all" || control.status === filterStatus;
@@ -149,7 +47,7 @@ export default function ComplianceControlsPage() {
     warning: controls.filter((c) => c.status === "warning").length,
   };
 
-  const getStatusIcon = (status: Control["status"]) => {
+  const getStatusIcon = (status: ControlStatus) => {
     switch (status) {
       case "pass":
         return <CheckCircle2 className="h-5 w-5 text-success" />;
@@ -157,10 +55,12 @@ export default function ComplianceControlsPage() {
         return <XCircle className="h-5 w-5 text-destructive" />;
       case "warning":
         return <AlertCircle className="h-5 w-5 text-warning" />;
+      default:
+        return <AlertCircle className="h-5 w-5 text-muted-foreground" />;
     }
   };
 
-  const getStatusBadge = (status: Control["status"]) => {
+  const getStatusBadge = (status: ControlStatus) => {
     switch (status) {
       case "pass":
         return "risk-badge-low";
@@ -168,8 +68,20 @@ export default function ComplianceControlsPage() {
         return "risk-badge-critical";
       case "warning":
         return "risk-badge-medium";
+      default:
+        return "risk-badge-medium";
     }
   };
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="flex items-center justify-center h-96">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </AppLayout>
+    );
+  }
 
   return (
     <AppLayout>
@@ -266,62 +178,72 @@ export default function ComplianceControlsPage() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {filteredControls.map((control, index) => (
-                <tr
-                  key={control.id}
-                  className="group hover:bg-muted/30 transition-colors cursor-pointer animate-fade-in"
-                  style={{ animationDelay: `${300 + index * 30}ms` }}
-                >
-                  <td className="px-4 py-4">
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(control.status)}
-                      <span className={cn("risk-badge capitalize hidden sm:inline-flex", getStatusBadge(control.status))}>
-                        {control.status}
+              {filteredControls.length > 0 ? (
+                filteredControls.map((control, index) => (
+                  <tr
+                    key={control.id}
+                    className="group hover:bg-muted/30 transition-colors cursor-pointer animate-fade-in"
+                    style={{ animationDelay: `${300 + index * 30}ms` }}
+                  >
+                    <td className="px-4 py-4">
+                      <div className="flex items-center gap-3">
+                        {getStatusIcon(control.status)}
+                        <span className={cn("risk-badge capitalize hidden sm:inline-flex", getStatusBadge(control.status))}>
+                          {control.status}
+                        </span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-mono text-muted-foreground">{control.id}</span>
+                        </div>
+                        <p className="font-medium text-foreground">{control.name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-1 max-w-md hidden lg:block">
+                          {control.description}
+                        </p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-4 hidden md:table-cell">
+                      <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
+                        {control.framework}
                       </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-mono text-muted-foreground">{control.id}</span>
+                    </td>
+                    <td className="px-4 py-4 text-sm text-muted-foreground hidden lg:table-cell">
+                      {control.category}
+                    </td>
+                    <td className="px-4 py-4 text-right">
+                      <div className="flex items-center justify-end gap-2">
+                        <div className="hidden sm:block w-16 h-1.5 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={cn(
+                              "h-full rounded-full transition-all",
+                              control.passRate >= 90
+                                ? "bg-success"
+                                : control.passRate >= 80
+                                ? "bg-warning"
+                                : "bg-destructive"
+                            )}
+                            style={{ width: `${control.passRate}%` }}
+                          />
+                        </div>
+                        <span className="text-sm font-semibold text-foreground">{control.passRate}%</span>
                       </div>
-                      <p className="font-medium text-foreground">{control.name}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1 max-w-md hidden lg:block">
-                        {control.description}
-                      </p>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 hidden md:table-cell">
-                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-medium text-primary">
-                      {control.framework}
-                    </span>
-                  </td>
-                  <td className="px-4 py-4 text-sm text-muted-foreground hidden lg:table-cell">
-                    {control.category}
-                  </td>
-                  <td className="px-4 py-4 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <div className="hidden sm:block w-16 h-1.5 rounded-full bg-muted overflow-hidden">
-                        <div
-                          className={cn(
-                            "h-full rounded-full transition-all",
-                            control.passRate >= 90
-                              ? "bg-success"
-                              : control.passRate >= 80
-                              ? "bg-warning"
-                              : "bg-destructive"
-                          )}
-                          style={{ width: `${control.passRate}%` }}
-                        />
-                      </div>
-                      <span className="text-sm font-semibold text-foreground">{control.passRate}%</span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right text-sm text-muted-foreground hidden sm:table-cell">
-                    {control.lastChecked}
+                    </td>
+                    <td className="px-4 py-4 text-right text-sm text-muted-foreground hidden sm:table-cell">
+                      {control.lastChecked}
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={6} className="px-4 py-12 text-center text-muted-foreground">
+                    {controls.length === 0 
+                      ? "No controls configured for this organization" 
+                      : "No controls match your search criteria"}
                   </td>
                 </tr>
-              ))}
+              )}
             </tbody>
           </table>
         </div>
