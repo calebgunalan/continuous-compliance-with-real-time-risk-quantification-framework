@@ -1,7 +1,10 @@
 import { AppLayout } from "@/components/layout/AppLayout";
 import { cn } from "@/lib/utils";
-import { AlertTriangle, DollarSign, TrendingDown, Shield, Target, Info } from "lucide-react";
+import { DollarSign, TrendingDown, Shield, Target, Info } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { WhatIfScenarioModeler } from "@/components/risk/WhatIfScenarioModeler";
+import { useThreatScenarios } from "@/hooks/useThreatScenarios";
+import { useOrganizationContext } from "@/contexts/OrganizationContext";
 
 interface ThreatScenario {
   id: string;
@@ -258,6 +261,11 @@ export default function RiskQuantificationPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* What-If Scenario Modeling */}
+      <div className="mt-6">
+        <WhatIfScenarioModeler />
       </div>
 
       {/* Detailed Scenarios Table */}
