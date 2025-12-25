@@ -1,0 +1,161 @@
+import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+
+export const useRealtimeControlTests = (organizationId: string | null) => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!organizationId) return;
+
+    console.log('Setting up realtime subscription for control test results');
+    
+    const channel = supabase
+      .channel('control-test-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'control_test_results',
+        },
+        (payload) => {
+          console.log('Control test result changed:', payload);
+          
+          // Invalidate relevant queries
+          queryClient.invalidateQueries({ queryKey: ['control_test_results'] });
+          queryClient.invalidateQueries({ queryKey: ['organization_controls', organizationId] });
+          queryClient.invalidateQueries({ queryKey: ['controls_pass_rate', organizationId] });
+          
+          if (payload.eventType === 'INSERT') {
+            const status = (payload.new as { status: string }).status;
+            if (status === 'fail') {
+              toast({
+                variant: 'destructive',
+                title: 'Control Test Failed',
+                description: 'A control test has failed. Check the compliance dashboard for details.',
+              });
+            }
+          }
+        }
+      )
+      .subscribe((status) => {
+        console.log('Realtime subscription status:', status);
+      });
+
+    return () => {
+      console.log('Cleaning up realtime subscription');
+      supabase.removeChannel(channel);
+    };
+  }, [organizationId, queryClient, toast]);
+};
+
+export const useRealtimeRiskCalculations = (organizationId: string | null) => {
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
+
+  useEffect(() => {
+    if (!organizationId) return;
+
+    console.log('Setting up realtime subscription for risk calculations');
+    
+    const channel = supabase
+      .channel('risk-calculation-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'risk_calculations',
+        },
+        (payload) => {
+          console.log('Risk calculation updated:', payload);
+          
+          // Invalidate relevant queries
+          queryClient.invalidateQueries({ queryKey: ['risk_calculations', organizationId] });
+          queryClient.invalidateQueries({ queryKey: ['latest_risk_calculation', organizationId] });
+          
+          toast({
+            title: 'Risk Calculation Updated',
+            description: 'New risk assessment data is available.',
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [organizationId, queryClient, toast]);
+};
+
+export const useRealtimeThreatScenarios = (organizationId: string | null) => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!organizationId) return;
+
+    console.log('Setting up realtime subscription for threat scenarios');
+    
+    const channel = supabase
+      .channel('threat-scenario-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'threat_scenarios',
+        },
+        (payload) => {
+          console.log('Threat scenario changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['threat_scenarios', organizationId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [organizationId, queryClient]);
+};
+
+export const useRealtimeMaturityAssessments = (organizationId: string | null) => {
+  const queryClient = useQueryClient();
+
+  useEffect(() => {
+    if (!organizationId) return;
+
+    console.log('Setting up realtime subscription for maturity assessments');
+    
+    const channel = supabase
+      .channel('maturity-assessment-updates')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'maturity_assessments',
+        },
+        (payload) => {
+          console.log('Maturity assessment changed:', payload);
+          queryClient.invalidateQueries({ queryKey: ['maturity_assessments', organizationId] });
+          queryClient.invalidateQueries({ queryKey: ['latest_maturity_assessment', organizationId] });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [organizationId, queryClient]);
+};
+
+// Combined hook for all realtime updates
+export const useAllRealtimeUpdates = (organizationId: string | null) => {
+  useRealtimeControlTests(organizationId);
+  useRealtimeRiskCalculations(organizationId);
+  useRealtimeThreatScenarios(organizationId);
+  useRealtimeMaturityAssessments(organizationId);
+};
