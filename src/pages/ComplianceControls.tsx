@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { useOrganizationContext } from "@/contexts/OrganizationContext";
 import { useOrganizationControls } from "@/hooks/useControls";
+import { ControlTestRunner } from "@/components/compliance/ControlTestRunner";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import type { ControlStatus } from "@/types/database";
 
@@ -113,6 +114,11 @@ export default function ComplianceControlsPage() {
           <p className="text-sm text-muted-foreground">Failing</p>
           <p className="text-2xl font-bold text-destructive">{stats.failing}</p>
         </div>
+      </div>
+
+      {/* Control Test Runner */}
+      <div className="mb-6 animate-slide-up" style={{ animationDelay: "175ms" }}>
+        <ControlTestRunner />
       </div>
 
       {/* Filters */}

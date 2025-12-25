@@ -3,6 +3,8 @@ import { cn } from "@/lib/utils";
 import { DollarSign, TrendingDown, Shield, Target, Info } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from "recharts";
 import { WhatIfScenarioModeler } from "@/components/risk/WhatIfScenarioModeler";
+import { MonteCarloSimulation } from "@/components/risk/MonteCarloSimulation";
+import { ExecutiveReportExport } from "@/components/reports/ExecutiveReportExport";
 import { useThreatScenarios } from "@/hooks/useThreatScenarios";
 import { useOrganizationContext } from "@/contexts/OrganizationContext";
 
@@ -263,9 +265,23 @@ export default function RiskQuantificationPage() {
         </div>
       </div>
 
+      {/* Monte Carlo Simulation */}
+      <div className="mt-6">
+        <MonteCarloSimulation 
+          baseRisk={totalRiskExposure * 1000000} 
+          volatility={0.35}
+          iterations={10000}
+        />
+      </div>
+
       {/* What-If Scenario Modeling */}
       <div className="mt-6">
         <WhatIfScenarioModeler />
+      </div>
+
+      {/* Executive Report Export */}
+      <div className="mt-6">
+        <ExecutiveReportExport />
       </div>
 
       {/* Detailed Scenarios Table */}

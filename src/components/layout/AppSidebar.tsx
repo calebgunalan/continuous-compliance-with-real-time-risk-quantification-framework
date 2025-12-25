@@ -12,6 +12,7 @@ import {
   ChevronLeft,
   ChevronRight,
   LogOut,
+  Database,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -29,6 +30,7 @@ const navItems: NavItem[] = [
   { label: "Compliance Controls", href: "/compliance", icon: Shield, badge: "87%" },
   { label: "Risk Quantification", href: "/risk", icon: AlertTriangle },
   { label: "Threat Scenarios", href: "/threats", icon: Target },
+  { label: "Evidence Sources", href: "/evidence", icon: Database },
   { label: "Maturity Assessment", href: "/maturity", icon: TrendingUp },
   { label: "Reports", href: "/reports", icon: FileText },
   { label: "Analytics", href: "/analytics", icon: BarChart3 },
