@@ -33,7 +33,7 @@ const navItems: NavItem[] = [
   { label: "Evidence Sources", href: "/evidence", icon: Database },
   { label: "Maturity Assessment", href: "/maturity", icon: TrendingUp },
   { label: "Reports", href: "/reports", icon: FileText },
-  { label: "Analytics", href: "/analytics", icon: BarChart3 },
+  { label: "Research Analytics", href: "/admin", icon: BarChart3 },
 ];
 
 const bottomNavItems: NavItem[] = [
