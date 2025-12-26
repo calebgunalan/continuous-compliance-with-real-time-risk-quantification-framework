@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useOrganizationContext } from "@/contexts/OrganizationContext";
 import { useOrganizationControls } from "@/hooks/useControls";
 import { ControlTestRunner } from "@/components/compliance/ControlTestRunner";
+import { ScheduledTestConfig } from "@/components/compliance/ScheduledTestConfig";
+import { ControlDriftDetector } from "@/components/compliance/ControlDriftDetector";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import type { ControlStatus } from "@/types/database";
 
@@ -116,9 +118,19 @@ export default function ComplianceControlsPage() {
         </div>
       </div>
 
-      {/* Control Test Runner */}
-      <div className="mb-6 animate-slide-up" style={{ animationDelay: "175ms" }}>
-        <ControlTestRunner />
+      {/* Control Test Runner + Scheduling */}
+      <div className="grid gap-6 lg:grid-cols-3 mb-6">
+        <div className="lg:col-span-2 animate-slide-up" style={{ animationDelay: "175ms" }}>
+          <ControlTestRunner />
+        </div>
+        <div className="space-y-6">
+          <div className="animate-slide-up" style={{ animationDelay: "200ms" }}>
+            <ScheduledTestConfig />
+          </div>
+          <div className="animate-slide-up" style={{ animationDelay: "225ms" }}>
+            <ControlDriftDetector />
+          </div>
+        </div>
       </div>
 
       {/* Filters */}

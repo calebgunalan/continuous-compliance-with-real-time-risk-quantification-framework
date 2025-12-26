@@ -5,6 +5,8 @@ import { MaturityIndicator } from "@/components/dashboard/MaturityIndicator";
 import { RiskExposureChart } from "@/components/dashboard/RiskExposureChart";
 import { ControlStatusList } from "@/components/dashboard/ControlStatusList";
 import { ThreatScenarioCard } from "@/components/dashboard/ThreatScenarioCard";
+import { IndustryBenchmark } from "@/components/dashboard/IndustryBenchmark";
+import { BreachProbabilityTracker } from "@/components/dashboard/BreachProbabilityTracker";
 import {
   DollarSign,
   Shield,
@@ -206,6 +208,12 @@ const Index = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Research & Analytics Section */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <BreachProbabilityTracker />
+        <IndustryBenchmark />
       </div>
 
       {/* Threat Scenarios Section */}
