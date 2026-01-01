@@ -1,1 +1,10 @@
 project_id = "oiawdxbwnfupwajxfdcp"
+
+[functions.send-notification]
+verify_jwt = true
+
+[functions.run-scheduled-tests]
+verify_jwt = false
+
+[functions.export-study-data]
+verify_jwt = true
