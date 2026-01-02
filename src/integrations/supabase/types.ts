@@ -46,6 +46,72 @@ export type Database = {
           },
         ]
       }
+      control_remediations: {
+        Row: {
+          assigned_to: string | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          organization_control_id: string
+          organization_id: string
+          priority: string
+          remediation_plan: string | null
+          resolved_at: string | null
+          root_cause: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          organization_control_id: string
+          organization_id: string
+          priority?: string
+          remediation_plan?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          organization_control_id?: string
+          organization_id?: string
+          priority?: string
+          remediation_plan?: string | null
+          resolved_at?: string | null
+          root_cause?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "control_remediations_organization_control_id_fkey"
+            columns: ["organization_control_id"]
+            isOneToOne: false
+            referencedRelation: "organization_controls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "control_remediations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       control_test_results: {
         Row: {
           evidence: Json | null
@@ -199,6 +265,53 @@ export type Database = {
           },
         ]
       }
+      notifications: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean
+          message: string
+          metadata: Json | null
+          organization_id: string
+          severity: string
+          title: string
+          type: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message: string
+          metadata?: Json | null
+          organization_id: string
+          severity?: string
+          title: string
+          type: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean
+          message?: string
+          metadata?: Json | null
+          organization_id?: string
+          severity?: string
+          title?: string
+          type?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       organization_controls: {
         Row: {
           control_id: string
@@ -320,6 +433,38 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      remediation_comments: {
+        Row: {
+          comment: string
+          created_at: string
+          id: string
+          remediation_id: string
+          user_id: string | null
+        }
+        Insert: {
+          comment: string
+          created_at?: string
+          id?: string
+          remediation_id: string
+          user_id?: string | null
+        }
+        Update: {
+          comment?: string
+          created_at?: string
+          id?: string
+          remediation_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "remediation_comments_remediation_id_fkey"
+            columns: ["remediation_id"]
+            isOneToOne: false
+            referencedRelation: "control_remediations"
             referencedColumns: ["id"]
           },
         ]

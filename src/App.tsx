@@ -16,6 +16,8 @@ import EvidenceSources from "./pages/EvidenceSources";
 import AdminDashboard from "./pages/AdminDashboard";
 import FrameworkMapping from "./pages/FrameworkMapping";
 import Settings from "./pages/Settings";
+import Reports from "./pages/Reports";
+import Remediation from "./pages/Remediation";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +41,8 @@ const App = () => (
             <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/frameworks" element={<ProtectedRoute><FrameworkMapping /></ProtectedRoute>} />
             <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+            <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
+            <Route path="/remediation" element={<ProtectedRoute><Remediation /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
