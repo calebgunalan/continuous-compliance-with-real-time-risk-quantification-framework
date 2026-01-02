@@ -41,6 +41,7 @@ import { useOrganizationContext } from "@/contexts/OrganizationContext";
 import { useEvidenceSources, useCreateEvidenceSource, useToggleEvidenceSource, useDeleteEvidenceSource } from "@/hooks/useEvidenceSources";
 import { toast } from "sonner";
 import { formatDistanceToNow, parseISO } from "date-fns";
+import { EvidenceCollectionMonitor } from "@/components/evidence/EvidenceCollectionMonitor";
 
 const connectorTypes = [
   { 
@@ -402,6 +403,11 @@ export default function EvidenceSourcesPage() {
             </Button>
           </div>
         )}
+      </div>
+
+      {/* Evidence Collection Monitor */}
+      <div className="mt-8">
+        <EvidenceCollectionMonitor />
       </div>
     </AppLayout>
   );
