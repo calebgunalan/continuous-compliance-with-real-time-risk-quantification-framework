@@ -14,10 +14,12 @@ import {
   LogOut,
   Database,
   Layers,
+  Wrench,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
+import { NotificationCenter } from "@/components/notifications/NotificationCenter";
 
 interface NavItem {
   label: string;
@@ -34,6 +36,7 @@ const navItems: NavItem[] = [
   { label: "Evidence Sources", href: "/evidence", icon: Database },
   { label: "Framework Mapping", href: "/frameworks", icon: Layers },
   { label: "Maturity Assessment", href: "/maturity", icon: TrendingUp },
+  { label: "Remediation", href: "/remediation", icon: Wrench },
   { label: "Reports", href: "/reports", icon: FileText },
   { label: "Research Analytics", href: "/admin", icon: BarChart3 },
 ];
@@ -87,12 +90,15 @@ export function AppSidebar() {
             </div>
           )}
         </Link>
-        <button
-          onClick={() => setCollapsed(!collapsed)}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
-        >
-          {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
-        </button>
+        <div className="flex items-center gap-1">
+          {!collapsed && <NotificationCenter />}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="flex h-7 w-7 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent hover:text-foreground transition-colors"
+          >
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+          </button>
+        </div>
       </div>
 
       {/* Main Navigation */}
