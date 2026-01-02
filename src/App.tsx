@@ -15,6 +15,7 @@ import ThreatScenarios from "./pages/ThreatScenarios";
 import EvidenceSources from "./pages/EvidenceSources";
 import AdminDashboard from "./pages/AdminDashboard";
 import FrameworkMapping from "./pages/FrameworkMapping";
+import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/evidence" element={<ProtectedRoute><EvidenceSources /></ProtectedRoute>} />
             <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
             <Route path="/frameworks" element={<ProtectedRoute><FrameworkMapping /></ProtectedRoute>} />
+            <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>

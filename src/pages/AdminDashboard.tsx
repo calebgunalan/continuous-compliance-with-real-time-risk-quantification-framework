@@ -30,6 +30,10 @@ import {
 import { useAllOrganizations, useAggregatedStats, useUserRole } from "@/hooks/useAdminDashboard";
 import { useState } from "react";
 import { Navigate } from "react-router-dom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { UserRoleManager } from "@/components/admin/UserRoleManager";
+import { DataExporter } from "@/components/admin/DataExporter";
+import { OrganizationBenchmark } from "@/components/dashboard/OrganizationBenchmark";
 
 const COLORS = [
   'hsl(var(--destructive))',
@@ -102,6 +106,16 @@ export default function AdminDashboardPage() {
           Aggregated data across all {stats?.totalOrganizations || 0} participating organizations
         </p>
       </div>
+
+      <Tabs defaultValue="analytics" className="space-y-6">
+        <TabsList className="bg-muted/50">
+          <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="users">User Management</TabsTrigger>
+          <TabsTrigger value="export">Data Export</TabsTrigger>
+          <TabsTrigger value="benchmark">Benchmarking</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="analytics" className="space-y-6">
 
       {/* Summary Stats */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5 mb-6">
@@ -354,6 +368,20 @@ export default function AdminDashboardPage() {
           </table>
         </div>
       </div>
+        </TabsContent>
+
+        <TabsContent value="users" className="animate-fade-in">
+          <UserRoleManager />
+        </TabsContent>
+
+        <TabsContent value="export" className="animate-fade-in">
+          <DataExporter />
+        </TabsContent>
+
+        <TabsContent value="benchmark" className="animate-fade-in">
+          <OrganizationBenchmark />
+        </TabsContent>
+      </Tabs>
     </AppLayout>
   );
 }
