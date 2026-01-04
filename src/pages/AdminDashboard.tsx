@@ -34,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserRoleManager } from "@/components/admin/UserRoleManager";
 import { DataExporter } from "@/components/admin/DataExporter";
 import { OrganizationBenchmark } from "@/components/dashboard/OrganizationBenchmark";
+import { SampleNotificationsGenerator } from "@/components/admin/SampleNotificationsGenerator";
 
 const COLORS = [
   'hsl(var(--destructive))',
@@ -113,6 +114,7 @@ export default function AdminDashboardPage() {
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="export">Data Export</TabsTrigger>
           <TabsTrigger value="benchmark">Benchmarking</TabsTrigger>
+          <TabsTrigger value="notifications">Test Notifications</TabsTrigger>
         </TabsList>
 
         <TabsContent value="analytics" className="space-y-6">
@@ -380,6 +382,10 @@ export default function AdminDashboardPage() {
 
         <TabsContent value="benchmark" className="animate-fade-in">
           <OrganizationBenchmark />
+        </TabsContent>
+
+        <TabsContent value="notifications" className="animate-fade-in">
+          <SampleNotificationsGenerator />
         </TabsContent>
       </Tabs>
     </AppLayout>
