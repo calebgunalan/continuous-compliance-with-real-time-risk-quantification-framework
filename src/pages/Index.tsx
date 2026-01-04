@@ -7,6 +7,7 @@ import { ControlStatusList } from "@/components/dashboard/ControlStatusList";
 import { ThreatScenarioCard } from "@/components/dashboard/ThreatScenarioCard";
 import { IndustryBenchmark } from "@/components/dashboard/IndustryBenchmark";
 import { BreachProbabilityTracker } from "@/components/dashboard/BreachProbabilityTracker";
+import { RemediationWidget } from "@/components/dashboard/RemediationWidget";
 import {
   DollarSign,
   Shield,
@@ -211,9 +212,10 @@ const Index = () => {
       </div>
 
       {/* Research & Analytics Section */}
-      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <BreachProbabilityTracker />
         <IndustryBenchmark />
+        <RemediationWidget />
       </div>
 
       {/* Threat Scenarios Section */}

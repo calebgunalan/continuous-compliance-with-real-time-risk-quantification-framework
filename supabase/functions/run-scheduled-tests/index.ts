@@ -132,16 +132,62 @@ serve(async (req: Request): Promise<Response> => {
     }, {} as Record<string, typeof failedControls>);
 
     for (const [orgId, failures] of Object.entries(failuresByOrg)) {
-      // Get organization users/admins to notify
+      // Create in-app notifications for each failure
+      const notifications = failures.map(failure => ({
+        organization_id: orgId,
+        type: 'control_failure',
+        title: `Control Test Failed: ${failure.control_name}`,
+        message: `The control ${failure.control_id} (${failure.framework}) has failed its scheduled test. ${failure.failure_reason}`,
+        severity: 'error',
+        metadata: {
+          control_id: failure.control_id,
+          control_name: failure.control_name,
+          framework: failure.framework,
+          tested_at: new Date().toISOString(),
+        },
+        is_read: false,
+      }));
+
+      if (notifications.length > 0) {
+        const { error: notifError } = await supabase
+          .from('notifications')
+          .insert(notifications);
+        
+        if (notifError) {
+          console.error(`Error creating notifications for org ${orgId}:`, notifError);
+        } else {
+          console.log(`Created ${notifications.length} notifications for org ${orgId}`);
+        }
+      }
+
+      // Get organization users to email (fetch user emails from auth)
       const { data: profiles } = await supabase
         .from("profiles")
         .select("id")
         .eq("organization_id", orgId);
 
       if (profiles && profiles.length > 0) {
-        // For each failure, you could call the send-notification function
-        // In production, batch these notifications
-        console.log(`${failures.length} control failures for org ${orgId}`);
+        // Note: In production, fetch actual emails from auth.users
+        // For now, log that we would send emails
+        console.log(`Would send email to ${profiles.length} users for ${failures.length} control failures in org ${orgId}`);
+        
+        // Optionally invoke send-notification edge function for each failure
+        // This can be enabled when email recipients are configured
+        // for (const failure of failures) {
+        //   await supabase.functions.invoke('send-notification', {
+        //     body: {
+        //       type: 'control_failure',
+        //       organization_id: orgId,
+        //       recipients: userEmails,
+        //       data: {
+        //         control_name: failure.control_name,
+        //         control_id: failure.control_id,
+        //         framework: failure.framework,
+        //         failure_reason: failure.failure_reason,
+        //       }
+        //     }
+        //   });
+        // }
       }
     }
 
