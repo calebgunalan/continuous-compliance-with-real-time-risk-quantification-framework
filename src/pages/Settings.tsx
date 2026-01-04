@@ -7,8 +7,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Bell, Mail, Clock, Shield, AlertTriangle, TrendingUp, FileText, Loader2, Save, CheckCircle2 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Bell, Mail, Clock, Shield, AlertTriangle, TrendingUp, FileText, Loader2, Save, CheckCircle2, Plus, X, Users } from "lucide-react";
 import { toast } from "sonner";
+
+interface EmailRecipient {
+  id: string;
+  email: string;
+  name: string;
+  notifyControlFailures: boolean;
+  notifyRiskAlerts: boolean;
+  notifyReports: boolean;
+}
 
 interface NotificationPreferences {
   emailEnabled: boolean;
@@ -21,10 +31,13 @@ interface NotificationPreferences {
   reportFrequency: 'daily' | 'weekly' | 'monthly';
   maturityChanges: boolean;
   securityIncidents: boolean;
+  recipients: EmailRecipient[];
 }
 
 export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
+  const [newRecipientEmail, setNewRecipientEmail] = useState('');
+  const [newRecipientName, setNewRecipientName] = useState('');
   const [preferences, setPreferences] = useState<NotificationPreferences>({
     emailEnabled: true,
     email: '',
@@ -36,6 +49,10 @@ export default function SettingsPage() {
     reportFrequency: 'weekly',
     maturityChanges: true,
     securityIncidents: true,
+    recipients: [
+      { id: '1', email: 'ciso@company.com', name: 'CISO', notifyControlFailures: true, notifyRiskAlerts: true, notifyReports: true },
+      { id: '2', email: 'security-team@company.com', name: 'Security Team', notifyControlFailures: true, notifyRiskAlerts: false, notifyReports: false },
+    ],
   });
 
   const handleSave = async () => {
@@ -61,6 +78,49 @@ export default function SettingsPage() {
     return `$${value.toFixed(0)}`;
   };
 
+  const addRecipient = () => {
+    if (!newRecipientEmail || !newRecipientName) {
+      toast.error("Please enter both name and email");
+      return;
+    }
+    if (!newRecipientEmail.includes('@')) {
+      toast.error("Please enter a valid email address");
+      return;
+    }
+    const newRecipient: EmailRecipient = {
+      id: Date.now().toString(),
+      email: newRecipientEmail,
+      name: newRecipientName,
+      notifyControlFailures: true,
+      notifyRiskAlerts: true,
+      notifyReports: false,
+    };
+    setPreferences(prev => ({
+      ...prev,
+      recipients: [...prev.recipients, newRecipient],
+    }));
+    setNewRecipientEmail('');
+    setNewRecipientName('');
+    toast.success("Recipient added");
+  };
+
+  const removeRecipient = (id: string) => {
+    setPreferences(prev => ({
+      ...prev,
+      recipients: prev.recipients.filter(r => r.id !== id),
+    }));
+    toast.success("Recipient removed");
+  };
+
+  const updateRecipient = (id: string, field: keyof EmailRecipient, value: boolean) => {
+    setPreferences(prev => ({
+      ...prev,
+      recipients: prev.recipients.map(r => 
+        r.id === id ? { ...r, [field]: value } : r
+      ),
+    }));
+  };
+
   return (
     <AppLayout>
       {/* Page Header */}
@@ -78,6 +138,10 @@ export default function SettingsPage() {
           <TabsTrigger value="notifications" className="gap-2">
             <Bell className="h-4 w-4" />
             Notifications
+          </TabsTrigger>
+          <TabsTrigger value="recipients" className="gap-2">
+            <Users className="h-4 w-4" />
+            Recipients
           </TabsTrigger>
           <TabsTrigger value="reports" className="gap-2">
             <FileText className="h-4 w-4" />
@@ -266,6 +330,137 @@ export default function SettingsPage() {
                   onCheckedChange={(v) => updatePreference('securityIncidents', v)}
                   disabled={!preferences.emailEnabled}
                 />
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="recipients" className="space-y-6 animate-fade-in">
+          {/* Email Recipients Configuration */}
+          <Card>
+            <CardHeader>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/15">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <CardTitle>Email Recipients</CardTitle>
+                  <CardDescription>Configure who receives email notifications for different alert types</CardDescription>
+                </div>
+              </div>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Add New Recipient */}
+              <div className="rounded-lg border border-dashed border-border p-4">
+                <p className="text-sm font-medium mb-3">Add New Recipient</p>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label htmlFor="recipientName" className="text-xs">Name</Label>
+                    <Input
+                      id="recipientName"
+                      placeholder="e.g., Security Lead"
+                      value={newRecipientName}
+                      onChange={(e) => setNewRecipientName(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label htmlFor="recipientEmail" className="text-xs">Email Address</Label>
+                    <Input
+                      id="recipientEmail"
+                      type="email"
+                      placeholder="email@company.com"
+                      value={newRecipientEmail}
+                      onChange={(e) => setNewRecipientEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="flex items-end">
+                    <Button onClick={addRecipient} className="w-full gap-2">
+                      <Plus className="h-4 w-4" />
+                      Add Recipient
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              {/* Recipients List */}
+              <div className="space-y-3">
+                <p className="text-sm font-medium">Configured Recipients ({preferences.recipients.length})</p>
+                {preferences.recipients.length === 0 ? (
+                  <div className="rounded-lg bg-muted/30 p-6 text-center">
+                    <Mail className="h-8 w-8 mx-auto mb-2 text-muted-foreground opacity-50" />
+                    <p className="text-sm text-muted-foreground">No recipients configured yet</p>
+                    <p className="text-xs text-muted-foreground">Add recipients above to receive email notifications</p>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {preferences.recipients.map((recipient) => (
+                      <div 
+                        key={recipient.id}
+                        className="flex items-center justify-between rounded-lg bg-muted/30 p-4 hover:bg-muted/50 transition-colors"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary font-medium text-sm">
+                            {recipient.name.charAt(0).toUpperCase()}
+                          </div>
+                          <div>
+                            <p className="font-medium text-foreground">{recipient.name}</p>
+                            <p className="text-sm text-muted-foreground">{recipient.email}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-4">
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground">Failures</Label>
+                            <Switch
+                              checked={recipient.notifyControlFailures}
+                              onCheckedChange={(v) => updateRecipient(recipient.id, 'notifyControlFailures', v)}
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground">Risk</Label>
+                            <Switch
+                              checked={recipient.notifyRiskAlerts}
+                              onCheckedChange={(v) => updateRecipient(recipient.id, 'notifyRiskAlerts', v)}
+                            />
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Label className="text-xs text-muted-foreground">Reports</Label>
+                            <Switch
+                              checked={recipient.notifyReports}
+                              onCheckedChange={(v) => updateRecipient(recipient.id, 'notifyReports', v)}
+                            />
+                          </div>
+                          <Button 
+                            variant="ghost" 
+                            size="icon"
+                            className="text-muted-foreground hover:text-destructive"
+                            onClick={() => removeRecipient(recipient.id)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Legend */}
+              <div className="rounded-lg bg-muted/20 p-3">
+                <p className="text-xs font-medium mb-2">Notification Types</p>
+                <div className="flex flex-wrap gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">Failures</Badge>
+                    <span>Control test failures</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="secondary" className="h-5 px-1.5 text-[10px] bg-warning/20 text-warning border-warning/30">Risk</Badge>
+                    <span>Risk threshold alerts</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="outline" className="h-5 px-1.5 text-[10px]">Reports</Badge>
+                    <span>Scheduled reports</span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
