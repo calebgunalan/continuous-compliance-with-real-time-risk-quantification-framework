@@ -14,6 +14,124 @@ export type Database = {
   }
   public: {
     Tables: {
+      audit_comparisons: {
+        Row: {
+          comparison_period_end: string | null
+          comparison_period_start: string | null
+          compliance_score_continuous: number | null
+          compliance_score_traditional: number | null
+          continuous_prep_time_hours: number | null
+          created_at: string
+          id: string
+          issues_detected_continuous: number | null
+          issues_detected_traditional: number | null
+          mean_time_to_detect_continuous_hours: number | null
+          mean_time_to_detect_traditional_days: number | null
+          organization_id: string
+          traditional_prep_time_hours: number | null
+        }
+        Insert: {
+          comparison_period_end?: string | null
+          comparison_period_start?: string | null
+          compliance_score_continuous?: number | null
+          compliance_score_traditional?: number | null
+          continuous_prep_time_hours?: number | null
+          created_at?: string
+          id?: string
+          issues_detected_continuous?: number | null
+          issues_detected_traditional?: number | null
+          mean_time_to_detect_continuous_hours?: number | null
+          mean_time_to_detect_traditional_days?: number | null
+          organization_id: string
+          traditional_prep_time_hours?: number | null
+        }
+        Update: {
+          comparison_period_end?: string | null
+          comparison_period_start?: string | null
+          compliance_score_continuous?: number | null
+          compliance_score_traditional?: number | null
+          continuous_prep_time_hours?: number | null
+          created_at?: string
+          id?: string
+          issues_detected_continuous?: number | null
+          issues_detected_traditional?: number | null
+          mean_time_to_detect_continuous_hours?: number | null
+          mean_time_to_detect_traditional_days?: number | null
+          organization_id?: string
+          traditional_prep_time_hours?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_comparisons_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      breach_incidents: {
+        Row: {
+          controls_failing_at_time: string[] | null
+          created_at: string
+          detection_method: string | null
+          financial_impact: number | null
+          id: string
+          incident_date: string
+          incident_type: string
+          maturity_level_at_time:
+            | Database["public"]["Enums"]["maturity_level"]
+            | null
+          organization_id: string
+          root_cause: string | null
+          severity: string
+          time_to_detect_hours: number | null
+          time_to_remediate_hours: number | null
+        }
+        Insert: {
+          controls_failing_at_time?: string[] | null
+          created_at?: string
+          detection_method?: string | null
+          financial_impact?: number | null
+          id?: string
+          incident_date: string
+          incident_type: string
+          maturity_level_at_time?:
+            | Database["public"]["Enums"]["maturity_level"]
+            | null
+          organization_id: string
+          root_cause?: string | null
+          severity?: string
+          time_to_detect_hours?: number | null
+          time_to_remediate_hours?: number | null
+        }
+        Update: {
+          controls_failing_at_time?: string[] | null
+          created_at?: string
+          detection_method?: string | null
+          financial_impact?: number | null
+          id?: string
+          incident_date?: string
+          incident_type?: string
+          maturity_level_at_time?:
+            | Database["public"]["Enums"]["maturity_level"]
+            | null
+          organization_id?: string
+          root_cause?: string | null
+          severity?: string
+          time_to_detect_hours?: number | null
+          time_to_remediate_hours?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "breach_incidents_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       compliance_frameworks: {
         Row: {
           enabled_at: string
@@ -39,6 +157,54 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "compliance_frameworks_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      control_effectiveness: {
+        Row: {
+          breach_probability_impact: number | null
+          confidence_level: number | null
+          control_id: string
+          id: string
+          measurement_date: string
+          organization_id: string
+          supporting_evidence: Json | null
+          vulnerability_reduction_factor: number | null
+        }
+        Insert: {
+          breach_probability_impact?: number | null
+          confidence_level?: number | null
+          control_id: string
+          id?: string
+          measurement_date?: string
+          organization_id: string
+          supporting_evidence?: Json | null
+          vulnerability_reduction_factor?: number | null
+        }
+        Update: {
+          breach_probability_impact?: number | null
+          confidence_level?: number | null
+          control_id?: string
+          id?: string
+          measurement_date?: string
+          organization_id?: string
+          supporting_evidence?: Json | null
+          vulnerability_reduction_factor?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "control_effectiveness_control_id_fkey"
+            columns: ["control_id"]
+            isOneToOne: false
+            referencedRelation: "controls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "control_effectiveness_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -506,6 +672,59 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "risk_calculations_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      study_participants: {
+        Row: {
+          baseline_maturity_level:
+            | Database["public"]["Enums"]["maturity_level"]
+            | null
+          baseline_risk_exposure: number | null
+          consent_signed: boolean | null
+          enrollment_date: string
+          id: string
+          industry_sector: string
+          notes: string | null
+          organization_id: string
+          study_group: string
+          withdrawal_date: string | null
+        }
+        Insert: {
+          baseline_maturity_level?:
+            | Database["public"]["Enums"]["maturity_level"]
+            | null
+          baseline_risk_exposure?: number | null
+          consent_signed?: boolean | null
+          enrollment_date?: string
+          id?: string
+          industry_sector: string
+          notes?: string | null
+          organization_id: string
+          study_group?: string
+          withdrawal_date?: string | null
+        }
+        Update: {
+          baseline_maturity_level?:
+            | Database["public"]["Enums"]["maturity_level"]
+            | null
+          baseline_risk_exposure?: number | null
+          consent_signed?: boolean | null
+          enrollment_date?: string
+          id?: string
+          industry_sector?: string
+          notes?: string | null
+          organization_id?: string
+          study_group?: string
+          withdrawal_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "study_participants_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"

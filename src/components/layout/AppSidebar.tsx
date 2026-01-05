@@ -15,6 +15,7 @@ import {
   Database,
   Layers,
   Wrench,
+  FlaskConical,
 } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
@@ -38,6 +39,7 @@ const navItems: NavItem[] = [
   { label: "Maturity Assessment", href: "/maturity", icon: TrendingUp },
   { label: "Remediation", href: "/remediation", icon: Wrench },
   { label: "Reports", href: "/reports", icon: FileText },
+  { label: "Research Validation", href: "/research", icon: FlaskConical },
   { label: "Research Analytics", href: "/admin", icon: BarChart3 },
 ];
 
