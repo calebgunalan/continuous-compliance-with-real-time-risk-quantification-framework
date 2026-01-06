@@ -2,6 +2,10 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BreachIncidentTracker } from "@/components/research/BreachIncidentTracker";
 import { CorrelationValidator } from "@/components/research/CorrelationValidator";
+import { TraditionalAuditSimulator } from "@/components/research/TraditionalAuditSimulator";
+import { BeforeAfterComparison } from "@/components/research/BeforeAfterComparison";
+import { ControlRiskImpact } from "@/components/compliance/ControlRiskImpact";
+import { BusinessCaseGenerator } from "@/components/reports/BusinessCaseGenerator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -10,7 +14,11 @@ import {
   Clock, 
   Users,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  BarChart3,
+  FileText,
+  Shield,
+  Calculator
 } from "lucide-react";
 
 export default function ResearchValidationPage() {
@@ -128,18 +136,30 @@ export default function ResearchValidationPage() {
 
       {/* Main Content Tabs */}
       <Tabs defaultValue="incidents" className="space-y-6">
-        <TabsList className="bg-muted/50">
+        <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
           <TabsTrigger value="incidents" className="gap-2">
             <AlertCircle className="h-4 w-4" />
             Breach Incidents
           </TabsTrigger>
           <TabsTrigger value="correlation" className="gap-2">
             <TrendingDown className="h-4 w-4" />
-            Correlation Analysis
+            Correlation
           </TabsTrigger>
-          <TabsTrigger value="detection" className="gap-2">
+          <TabsTrigger value="comparison" className="gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Before/After
+          </TabsTrigger>
+          <TabsTrigger value="simulator" className="gap-2">
             <Clock className="h-4 w-4" />
-            Detection Time
+            Audit Simulator
+          </TabsTrigger>
+          <TabsTrigger value="impact" className="gap-2">
+            <Shield className="h-4 w-4" />
+            Control Impact
+          </TabsTrigger>
+          <TabsTrigger value="business" className="gap-2">
+            <Calculator className="h-4 w-4" />
+            Business Case
           </TabsTrigger>
         </TabsList>
 
@@ -151,25 +171,20 @@ export default function ResearchValidationPage() {
           <CorrelationValidator />
         </TabsContent>
 
-        <TabsContent value="detection" className="animate-fade-in">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Clock className="h-5 w-5 text-primary" />
-                Detection Time Analysis
-              </CardTitle>
-              <CardDescription>
-                Compare mean time to detect (MTTD) between continuous monitoring and periodic audits
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-12 text-muted-foreground">
-                <Clock className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Detection time analysis will be populated as control failures are tracked over time.</p>
-                <p className="text-sm mt-2">Track failures in the Compliance Controls section to generate data.</p>
-              </div>
-            </CardContent>
-          </Card>
+        <TabsContent value="comparison" className="animate-fade-in">
+          <BeforeAfterComparison />
+        </TabsContent>
+
+        <TabsContent value="simulator" className="animate-fade-in">
+          <TraditionalAuditSimulator />
+        </TabsContent>
+
+        <TabsContent value="impact" className="animate-fade-in">
+          <ControlRiskImpact />
+        </TabsContent>
+
+        <TabsContent value="business" className="animate-fade-in">
+          <BusinessCaseGenerator />
         </TabsContent>
       </Tabs>
     </AppLayout>
