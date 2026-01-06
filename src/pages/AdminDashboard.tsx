@@ -35,6 +35,7 @@ import { UserRoleManager } from "@/components/admin/UserRoleManager";
 import { DataExporter } from "@/components/admin/DataExporter";
 import { OrganizationBenchmark } from "@/components/dashboard/OrganizationBenchmark";
 import { SampleNotificationsGenerator } from "@/components/admin/SampleNotificationsGenerator";
+import { StudyParticipantsManager } from "@/components/admin/StudyParticipantsManager";
 
 const COLORS = [
   'hsl(var(--destructive))',
@@ -111,6 +112,7 @@ export default function AdminDashboardPage() {
       <Tabs defaultValue="analytics" className="space-y-6">
         <TabsList className="bg-muted/50">
           <TabsTrigger value="analytics">Analytics</TabsTrigger>
+          <TabsTrigger value="participants">Study Participants</TabsTrigger>
           <TabsTrigger value="users">User Management</TabsTrigger>
           <TabsTrigger value="export">Data Export</TabsTrigger>
           <TabsTrigger value="benchmark">Benchmarking</TabsTrigger>
@@ -370,6 +372,10 @@ export default function AdminDashboardPage() {
           </table>
         </div>
       </div>
+        </TabsContent>
+
+        <TabsContent value="participants" className="animate-fade-in">
+          <StudyParticipantsManager />
         </TabsContent>
 
         <TabsContent value="users" className="animate-fade-in">
