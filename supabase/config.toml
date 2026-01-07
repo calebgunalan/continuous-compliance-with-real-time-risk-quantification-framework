@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.export-study-data]
 verify_jwt = true
+
+[functions.collect-aws-evidence]
+verify_jwt = false
+
+[functions.collect-okta-evidence]
+verify_jwt = false
+
+[functions.collect-azure-evidence]
+verify_jwt = false
