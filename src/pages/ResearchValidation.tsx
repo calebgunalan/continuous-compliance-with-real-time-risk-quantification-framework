@@ -6,6 +6,10 @@ import { TraditionalAuditSimulator } from "@/components/research/TraditionalAudi
 import { BeforeAfterComparison } from "@/components/research/BeforeAfterComparison";
 import { ControlRiskImpact } from "@/components/compliance/ControlRiskImpact";
 import { BusinessCaseGenerator } from "@/components/reports/BusinessCaseGenerator";
+import { DetectionTimeAnalyzer } from "@/components/compliance/DetectionTimeAnalyzer";
+import { InvestmentPrioritizer } from "@/components/risk/InvestmentPrioritizer";
+import { DecisionExperiment } from "@/components/research/DecisionExperiment";
+import { UserFeedbackCollector } from "@/components/research/UserFeedbackCollector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -18,7 +22,11 @@ import {
   BarChart3,
   FileText,
   Shield,
-  Calculator
+  Calculator,
+  Timer,
+  DollarSign,
+  Beaker,
+  MessageSquare
 } from "lucide-react";
 
 export default function ResearchValidationPage() {
@@ -139,7 +147,7 @@ export default function ResearchValidationPage() {
         <TabsList className="bg-muted/50 flex-wrap h-auto gap-1 p-1">
           <TabsTrigger value="incidents" className="gap-2">
             <AlertCircle className="h-4 w-4" />
-            Breach Incidents
+            Incidents
           </TabsTrigger>
           <TabsTrigger value="correlation" className="gap-2">
             <TrendingDown className="h-4 w-4" />
@@ -151,15 +159,31 @@ export default function ResearchValidationPage() {
           </TabsTrigger>
           <TabsTrigger value="simulator" className="gap-2">
             <Clock className="h-4 w-4" />
-            Audit Simulator
+            Audit Sim
+          </TabsTrigger>
+          <TabsTrigger value="detection" className="gap-2">
+            <Timer className="h-4 w-4" />
+            MTTD
+          </TabsTrigger>
+          <TabsTrigger value="investment" className="gap-2">
+            <DollarSign className="h-4 w-4" />
+            Investment
+          </TabsTrigger>
+          <TabsTrigger value="experiment" className="gap-2">
+            <Beaker className="h-4 w-4" />
+            Experiment
+          </TabsTrigger>
+          <TabsTrigger value="feedback" className="gap-2">
+            <MessageSquare className="h-4 w-4" />
+            Feedback
           </TabsTrigger>
           <TabsTrigger value="impact" className="gap-2">
             <Shield className="h-4 w-4" />
-            Control Impact
+            Impact
           </TabsTrigger>
           <TabsTrigger value="business" className="gap-2">
             <Calculator className="h-4 w-4" />
-            Business Case
+            Business
           </TabsTrigger>
         </TabsList>
 
@@ -177,6 +201,22 @@ export default function ResearchValidationPage() {
 
         <TabsContent value="simulator" className="animate-fade-in">
           <TraditionalAuditSimulator />
+        </TabsContent>
+
+        <TabsContent value="detection" className="animate-fade-in">
+          <DetectionTimeAnalyzer />
+        </TabsContent>
+
+        <TabsContent value="investment" className="animate-fade-in">
+          <InvestmentPrioritizer />
+        </TabsContent>
+
+        <TabsContent value="experiment" className="animate-fade-in">
+          <DecisionExperiment />
+        </TabsContent>
+
+        <TabsContent value="feedback" className="animate-fade-in">
+          <UserFeedbackCollector />
         </TabsContent>
 
         <TabsContent value="impact" className="animate-fade-in">
