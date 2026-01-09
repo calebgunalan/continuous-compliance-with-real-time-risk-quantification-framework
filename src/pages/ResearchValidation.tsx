@@ -10,6 +10,9 @@ import { DetectionTimeAnalyzer } from "@/components/compliance/DetectionTimeAnal
 import { InvestmentPrioritizer } from "@/components/risk/InvestmentPrioritizer";
 import { DecisionExperiment } from "@/components/research/DecisionExperiment";
 import { UserFeedbackCollector } from "@/components/research/UserFeedbackCollector";
+import { InterviewGuide } from "@/components/research/InterviewGuide";
+import { ArchitectureDocumentation } from "@/components/research/ArchitectureDocumentation";
+import { ResearchContributionSummary } from "@/components/research/ResearchContributionSummary";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -26,7 +29,10 @@ import {
   Timer,
   DollarSign,
   Beaker,
-  MessageSquare
+  MessageSquare,
+  ClipboardList,
+  Network,
+  Award
 } from "lucide-react";
 
 export default function ResearchValidationPage() {
