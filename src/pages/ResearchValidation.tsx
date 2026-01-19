@@ -187,9 +187,21 @@ export default function ResearchValidationPage() {
             <Shield className="h-4 w-4" />
             Impact
           </TabsTrigger>
-          <TabsTrigger value="business" className="gap-2">
+        <TabsTrigger value="business" className="gap-2">
             <Calculator className="h-4 w-4" />
             Business
+          </TabsTrigger>
+          <TabsTrigger value="interviews" className="gap-2">
+            <ClipboardList className="h-4 w-4" />
+            Interviews
+          </TabsTrigger>
+          <TabsTrigger value="architecture" className="gap-2">
+            <Network className="h-4 w-4" />
+            Architecture
+          </TabsTrigger>
+          <TabsTrigger value="contributions" className="gap-2">
+            <Award className="h-4 w-4" />
+            Contributions
           </TabsTrigger>
         </TabsList>
 
@@ -231,6 +243,18 @@ export default function ResearchValidationPage() {
 
         <TabsContent value="business" className="animate-fade-in">
           <BusinessCaseGenerator />
+        </TabsContent>
+
+        <TabsContent value="interviews" className="animate-fade-in">
+          <InterviewGuide />
+        </TabsContent>
+
+        <TabsContent value="architecture" className="animate-fade-in">
+          <ArchitectureDocumentation />
+        </TabsContent>
+
+        <TabsContent value="contributions" className="animate-fade-in">
+          <ResearchContributionSummary />
         </TabsContent>
       </Tabs>
     </AppLayout>
