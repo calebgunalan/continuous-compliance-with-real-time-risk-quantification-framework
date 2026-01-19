@@ -13,6 +13,7 @@ import { UserFeedbackCollector } from "@/components/research/UserFeedbackCollect
 import { InterviewGuide } from "@/components/research/InterviewGuide";
 import { ArchitectureDocumentation } from "@/components/research/ArchitectureDocumentation";
 import { ResearchContributionSummary } from "@/components/research/ResearchContributionSummary";
+import { CaseStudyGenerator } from "@/components/research/CaseStudyGenerator";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -32,7 +33,8 @@ import {
   MessageSquare,
   ClipboardList,
   Network,
-  Award
+  Award,
+  BookOpen
 } from "lucide-react";
 
 export default function ResearchValidationPage() {
@@ -203,6 +205,10 @@ export default function ResearchValidationPage() {
             <Award className="h-4 w-4" />
             Contributions
           </TabsTrigger>
+          <TabsTrigger value="casestudies" className="gap-2">
+            <BookOpen className="h-4 w-4" />
+            Case Studies
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="incidents" className="animate-fade-in">
@@ -255,6 +261,10 @@ export default function ResearchValidationPage() {
 
         <TabsContent value="contributions" className="animate-fade-in">
           <ResearchContributionSummary />
+        </TabsContent>
+
+        <TabsContent value="casestudies" className="animate-fade-in">
+          <CaseStudyGenerator />
         </TabsContent>
       </Tabs>
     </AppLayout>
