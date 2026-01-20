@@ -15,6 +15,7 @@ import { ArchitectureDocumentation } from "@/components/research/ArchitectureDoc
 import { ResearchContributionSummary } from "@/components/research/ResearchContributionSummary";
 import { CaseStudyGenerator } from "@/components/research/CaseStudyGenerator";
 import { PublicationPreparation } from "@/components/research/PublicationPreparation";
+import { StakeholderCommunication } from "@/components/research/StakeholderCommunication";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -36,7 +37,8 @@ import {
   Network,
   Award,
   BookOpen,
-  Newspaper
+  Newspaper,
+  Mail
 } from "lucide-react";
 
 export default function ResearchValidationPage() {
@@ -215,6 +217,10 @@ export default function ResearchValidationPage() {
             <Newspaper className="h-4 w-4" />
             Publication
           </TabsTrigger>
+          <TabsTrigger value="stakeholders" className="gap-2">
+            <Mail className="h-4 w-4" />
+            Stakeholders
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="incidents" className="animate-fade-in">
@@ -275,6 +281,10 @@ export default function ResearchValidationPage() {
 
         <TabsContent value="publication" className="animate-fade-in">
           <PublicationPreparation />
+        </TabsContent>
+
+        <TabsContent value="stakeholders" className="animate-fade-in">
+          <StakeholderCommunication />
         </TabsContent>
       </Tabs>
     </AppLayout>
