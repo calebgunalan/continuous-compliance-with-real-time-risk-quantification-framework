@@ -16,6 +16,10 @@ import { ResearchContributionSummary } from "@/components/research/ResearchContr
 import { CaseStudyGenerator } from "@/components/research/CaseStudyGenerator";
 import { PublicationPreparation } from "@/components/research/PublicationPreparation";
 import { StakeholderCommunication } from "@/components/research/StakeholderCommunication";
+import { TimelineGanttChart } from "@/components/research/TimelineGanttChart";
+import { BudgetResourceTracker } from "@/components/research/BudgetResourceTracker";
+import { RiskMitigationTracker } from "@/components/research/RiskMitigationTracker";
+import { SuccessMetricsDashboard } from "@/components/research/SuccessMetricsDashboard";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { 
@@ -38,7 +42,9 @@ import {
   Award,
   BookOpen,
   Newspaper,
-  Mail
+  Mail,
+  Calendar,
+  Target
 } from "lucide-react";
 
 export default function ResearchValidationPage() {
@@ -221,6 +227,22 @@ export default function ResearchValidationPage() {
             <Mail className="h-4 w-4" />
             Stakeholders
           </TabsTrigger>
+          <TabsTrigger value="timeline" className="gap-2">
+            <Calendar className="h-4 w-4" />
+            Timeline
+          </TabsTrigger>
+          <TabsTrigger value="budget" className="gap-2">
+            <DollarSign className="h-4 w-4" />
+            Budget
+          </TabsTrigger>
+          <TabsTrigger value="risks" className="gap-2">
+            <AlertCircle className="h-4 w-4" />
+            Risks
+          </TabsTrigger>
+          <TabsTrigger value="metrics" className="gap-2">
+            <Target className="h-4 w-4" />
+            Metrics
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="incidents" className="animate-fade-in">
@@ -285,6 +307,22 @@ export default function ResearchValidationPage() {
 
         <TabsContent value="stakeholders" className="animate-fade-in">
           <StakeholderCommunication />
+        </TabsContent>
+
+        <TabsContent value="timeline" className="animate-fade-in">
+          <TimelineGanttChart />
+        </TabsContent>
+
+        <TabsContent value="budget" className="animate-fade-in">
+          <BudgetResourceTracker />
+        </TabsContent>
+
+        <TabsContent value="risks" className="animate-fade-in">
+          <RiskMitigationTracker />
+        </TabsContent>
+
+        <TabsContent value="metrics" className="animate-fade-in">
+          <SuccessMetricsDashboard />
         </TabsContent>
       </Tabs>
     </AppLayout>
