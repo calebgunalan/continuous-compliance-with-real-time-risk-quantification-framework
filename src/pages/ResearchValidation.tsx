@@ -20,7 +20,12 @@ import { TimelineGanttChart } from "@/components/research/TimelineGanttChart";
 import { BudgetResourceTracker } from "@/components/research/BudgetResourceTracker";
 import { RiskMitigationTracker } from "@/components/research/RiskMitigationTracker";
 import { SuccessMetricsDashboard } from "@/components/research/SuccessMetricsDashboard";
+import { FundingProposalGenerator } from "@/components/research/FundingProposalGenerator";
+import { ParticipantSupportTicketing } from "@/components/research/ParticipantSupportTicketing";
+import { ConsentIRBManagement } from "@/components/research/ConsentIRBManagement";
+import { ResearchDataExporter } from "@/components/research/ResearchDataExporter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import { Badge } from "@/components/ui/badge";
 import { 
   FlaskConical, 
@@ -44,7 +49,11 @@ import {
   Newspaper,
   Mail,
   Calendar,
-  Target
+  Target,
+  Banknote,
+  Ticket,
+  FileCheck,
+  Database
 } from "lucide-react";
 
 export default function ResearchValidationPage() {
@@ -243,87 +252,48 @@ export default function ResearchValidationPage() {
             <Target className="h-4 w-4" />
             Metrics
           </TabsTrigger>
+          <TabsTrigger value="funding" className="gap-2">
+            <Banknote className="h-4 w-4" />
+            Funding
+          </TabsTrigger>
+          <TabsTrigger value="support" className="gap-2">
+            <Ticket className="h-4 w-4" />
+            Support
+          </TabsTrigger>
+          <TabsTrigger value="consent" className="gap-2">
+            <FileCheck className="h-4 w-4" />
+            Consent
+          </TabsTrigger>
+          <TabsTrigger value="export" className="gap-2">
+            <Database className="h-4 w-4" />
+            Export
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="incidents" className="animate-fade-in">
-          <BreachIncidentTracker />
-        </TabsContent>
-
-        <TabsContent value="correlation" className="animate-fade-in">
-          <CorrelationValidator />
-        </TabsContent>
-
-        <TabsContent value="comparison" className="animate-fade-in">
-          <BeforeAfterComparison />
-        </TabsContent>
-
-        <TabsContent value="simulator" className="animate-fade-in">
-          <TraditionalAuditSimulator />
-        </TabsContent>
-
-        <TabsContent value="detection" className="animate-fade-in">
-          <DetectionTimeAnalyzer />
-        </TabsContent>
-
-        <TabsContent value="investment" className="animate-fade-in">
-          <InvestmentPrioritizer />
-        </TabsContent>
-
-        <TabsContent value="experiment" className="animate-fade-in">
-          <DecisionExperiment />
-        </TabsContent>
-
-        <TabsContent value="feedback" className="animate-fade-in">
-          <UserFeedbackCollector />
-        </TabsContent>
-
-        <TabsContent value="impact" className="animate-fade-in">
-          <ControlRiskImpact />
-        </TabsContent>
-
-        <TabsContent value="business" className="animate-fade-in">
-          <BusinessCaseGenerator />
-        </TabsContent>
-
-        <TabsContent value="interviews" className="animate-fade-in">
-          <InterviewGuide />
-        </TabsContent>
-
-        <TabsContent value="architecture" className="animate-fade-in">
-          <ArchitectureDocumentation />
-        </TabsContent>
-
-        <TabsContent value="contributions" className="animate-fade-in">
-          <ResearchContributionSummary />
-        </TabsContent>
-
-        <TabsContent value="casestudies" className="animate-fade-in">
-          <CaseStudyGenerator />
-        </TabsContent>
-
-        <TabsContent value="publication" className="animate-fade-in">
-          <PublicationPreparation />
-        </TabsContent>
-
-        <TabsContent value="stakeholders" className="animate-fade-in">
-          <StakeholderCommunication />
-        </TabsContent>
-
-        <TabsContent value="timeline" className="animate-fade-in">
-          <TimelineGanttChart />
-        </TabsContent>
-
-        <TabsContent value="budget" className="animate-fade-in">
-          <BudgetResourceTracker />
-        </TabsContent>
-
-        <TabsContent value="risks" className="animate-fade-in">
-          <RiskMitigationTracker />
-        </TabsContent>
-
-        <TabsContent value="metrics" className="animate-fade-in">
-          <SuccessMetricsDashboard />
-        </TabsContent>
+        <TabsContent value="incidents" className="animate-fade-in"><BreachIncidentTracker /></TabsContent>
+        <TabsContent value="correlation" className="animate-fade-in"><CorrelationValidator /></TabsContent>
+        <TabsContent value="comparison" className="animate-fade-in"><BeforeAfterComparison /></TabsContent>
+        <TabsContent value="simulator" className="animate-fade-in"><TraditionalAuditSimulator /></TabsContent>
+        <TabsContent value="detection" className="animate-fade-in"><DetectionTimeAnalyzer /></TabsContent>
+        <TabsContent value="investment" className="animate-fade-in"><InvestmentPrioritizer /></TabsContent>
+        <TabsContent value="experiment" className="animate-fade-in"><DecisionExperiment /></TabsContent>
+        <TabsContent value="feedback" className="animate-fade-in"><UserFeedbackCollector /></TabsContent>
+        <TabsContent value="impact" className="animate-fade-in"><ControlRiskImpact /></TabsContent>
+        <TabsContent value="business" className="animate-fade-in"><BusinessCaseGenerator /></TabsContent>
+        <TabsContent value="interviews" className="animate-fade-in"><InterviewGuide /></TabsContent>
+        <TabsContent value="architecture" className="animate-fade-in"><ArchitectureDocumentation /></TabsContent>
+        <TabsContent value="contributions" className="animate-fade-in"><ResearchContributionSummary /></TabsContent>
+        <TabsContent value="casestudies" className="animate-fade-in"><CaseStudyGenerator /></TabsContent>
+        <TabsContent value="publication" className="animate-fade-in"><PublicationPreparation /></TabsContent>
+        <TabsContent value="stakeholders" className="animate-fade-in"><StakeholderCommunication /></TabsContent>
+        <TabsContent value="timeline" className="animate-fade-in"><TimelineGanttChart /></TabsContent>
+        <TabsContent value="budget" className="animate-fade-in"><BudgetResourceTracker /></TabsContent>
+        <TabsContent value="risks" className="animate-fade-in"><RiskMitigationTracker /></TabsContent>
+        <TabsContent value="metrics" className="animate-fade-in"><SuccessMetricsDashboard /></TabsContent>
+        <TabsContent value="funding" className="animate-fade-in"><FundingProposalGenerator /></TabsContent>
+        <TabsContent value="support" className="animate-fade-in"><ParticipantSupportTicketing /></TabsContent>
+        <TabsContent value="consent" className="animate-fade-in"><ConsentIRBManagement /></TabsContent>
+        <TabsContent value="export" className="animate-fade-in"><ResearchDataExporter /></TabsContent>
       </Tabs>
     </AppLayout>
   );
