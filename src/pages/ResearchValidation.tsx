@@ -26,7 +26,6 @@ import { ConsentIRBManagement } from "@/components/research/ConsentIRBManagement
 import { ResearchDataExporter } from "@/components/research/ResearchDataExporter";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Badge } from "@/components/ui/badge";
 import { 
   FlaskConical, 
   TrendingDown, 

@@ -132,6 +132,51 @@ export type Database = {
           },
         ]
       }
+      budget_items: {
+        Row: {
+          budgeted_amount: number
+          category: string
+          created_at: string
+          description: string | null
+          fiscal_year: string | null
+          funding_source: string | null
+          id: string
+          is_recurring: boolean | null
+          item_name: string
+          notes: string | null
+          spent_amount: number
+          updated_at: string
+        }
+        Insert: {
+          budgeted_amount?: number
+          category: string
+          created_at?: string
+          description?: string | null
+          fiscal_year?: string | null
+          funding_source?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          item_name: string
+          notes?: string | null
+          spent_amount?: number
+          updated_at?: string
+        }
+        Update: {
+          budgeted_amount?: number
+          category?: string
+          created_at?: string
+          description?: string | null
+          fiscal_year?: string | null
+          funding_source?: string | null
+          id?: string
+          is_recurring?: boolean | null
+          item_name?: string
+          notes?: string | null
+          spent_amount?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       compliance_frameworks: {
         Row: {
           enabled_at: string
@@ -160,6 +205,69 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      consent_records: {
+        Row: {
+          consent_document_url: string | null
+          consent_type: string
+          consent_version: string
+          created_at: string
+          id: string
+          ip_address: string | null
+          is_active: boolean
+          organization_id: string
+          participant_id: string | null
+          revocation_reason: string | null
+          revoked_at: string | null
+          signed_at: string
+          signed_by: string
+        }
+        Insert: {
+          consent_document_url?: string | null
+          consent_type?: string
+          consent_version?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean
+          organization_id: string
+          participant_id?: string | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          signed_at?: string
+          signed_by: string
+        }
+        Update: {
+          consent_document_url?: string | null
+          consent_type?: string
+          consent_version?: string
+          created_at?: string
+          id?: string
+          ip_address?: string | null
+          is_active?: boolean
+          organization_id?: string
+          participant_id?: string | null
+          revocation_reason?: string | null
+          revoked_at?: string | null
+          signed_at?: string
+          signed_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "consent_records_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "consent_records_participant_id_fkey"
+            columns: ["participant_id"]
+            isOneToOne: false
+            referencedRelation: "study_participants"
             referencedColumns: ["id"]
           },
         ]
@@ -393,6 +501,77 @@ export type Database = {
           },
         ]
       }
+      funding_applications: {
+        Row: {
+          awarded_amount: number | null
+          budget_breakdown: Json | null
+          co_investigators: Json | null
+          created_at: string
+          decision_date: string | null
+          decision_notes: string | null
+          funding_source: string
+          id: string
+          organization_id: string | null
+          principal_investigator: string | null
+          program_name: string
+          proposal_document_url: string | null
+          proposal_title: string
+          requested_amount: number
+          status: string
+          submission_deadline: string | null
+          submitted_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          awarded_amount?: number | null
+          budget_breakdown?: Json | null
+          co_investigators?: Json | null
+          created_at?: string
+          decision_date?: string | null
+          decision_notes?: string | null
+          funding_source: string
+          id?: string
+          organization_id?: string | null
+          principal_investigator?: string | null
+          program_name: string
+          proposal_document_url?: string | null
+          proposal_title: string
+          requested_amount?: number
+          status?: string
+          submission_deadline?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          awarded_amount?: number | null
+          budget_breakdown?: Json | null
+          co_investigators?: Json | null
+          created_at?: string
+          decision_date?: string | null
+          decision_notes?: string | null
+          funding_source?: string
+          id?: string
+          organization_id?: string | null
+          principal_investigator?: string | null
+          program_name?: string
+          proposal_document_url?: string | null
+          proposal_title?: string
+          requested_amount?: number
+          status?: string
+          submission_deadline?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "funding_applications_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       maturity_assessments: {
         Row: {
           assessed_at: string
@@ -603,6 +782,105 @@ export type Database = {
           },
         ]
       }
+      project_milestones: {
+        Row: {
+          actual_date: string | null
+          assigned_to: string | null
+          created_at: string
+          dependencies: Json | null
+          description: string | null
+          id: string
+          milestone_name: string
+          notes: string | null
+          phase_name: string
+          progress_percentage: number
+          status: string
+          target_date: string
+          updated_at: string
+        }
+        Insert: {
+          actual_date?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          dependencies?: Json | null
+          description?: string | null
+          id?: string
+          milestone_name: string
+          notes?: string | null
+          phase_name: string
+          progress_percentage?: number
+          status?: string
+          target_date: string
+          updated_at?: string
+        }
+        Update: {
+          actual_date?: string | null
+          assigned_to?: string | null
+          created_at?: string
+          dependencies?: Json | null
+          description?: string | null
+          id?: string
+          milestone_name?: string
+          notes?: string | null
+          phase_name?: string
+          progress_percentage?: number
+          status?: string
+          target_date?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      project_risks: {
+        Row: {
+          contingency_plan: string | null
+          created_at: string
+          description: string
+          id: string
+          impact: number
+          likelihood: number
+          mitigation_strategy: string | null
+          owner: string | null
+          review_date: string | null
+          risk_category: string
+          risk_name: string
+          risk_score: number | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          contingency_plan?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          impact?: number
+          likelihood?: number
+          mitigation_strategy?: string | null
+          owner?: string | null
+          review_date?: string | null
+          risk_category: string
+          risk_name: string
+          risk_score?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          contingency_plan?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          impact?: number
+          likelihood?: number
+          mitigation_strategy?: string | null
+          owner?: string | null
+          review_date?: string | null
+          risk_category?: string
+          risk_name?: string
+          risk_score?: number | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       remediation_comments: {
         Row: {
           comment: string
@@ -725,6 +1003,110 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "study_participants_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      success_metrics: {
+        Row: {
+          category: string
+          created_at: string
+          current_value: number | null
+          description: string | null
+          id: string
+          last_measured_at: string | null
+          measurement_method: string | null
+          metric_name: string
+          notes: string | null
+          status: string
+          target_value: number | null
+          unit: string | null
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          last_measured_at?: string | null
+          measurement_method?: string | null
+          metric_name: string
+          notes?: string | null
+          status?: string
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          current_value?: number | null
+          description?: string | null
+          id?: string
+          last_measured_at?: string | null
+          measurement_method?: string | null
+          metric_name?: string
+          notes?: string | null
+          status?: string
+          target_value?: number | null
+          unit?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          assigned_to: string | null
+          category: string
+          created_at: string
+          created_by: string | null
+          description: string
+          id: string
+          organization_id: string
+          priority: string
+          resolution: string | null
+          resolved_at: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description: string
+          id?: string
+          organization_id: string
+          priority?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string | null
+          category?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string
+          id?: string
+          organization_id?: string
+          priority?: string
+          resolution?: string | null
+          resolved_at?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
