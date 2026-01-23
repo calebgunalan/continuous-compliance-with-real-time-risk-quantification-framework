@@ -3,57 +3,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DollarSign, Users, Server, Gift, TrendingUp, AlertTriangle } from "lucide-react";
-
-interface BudgetCategory {
-  name: string;
-  budgeted: number;
-  spent: number;
-  items: { name: string; budgeted: number; spent: number }[];
-}
-
-const budgetData: BudgetCategory[] = [
-  {
-    name: 'Personnel',
-    budgeted: 350000,
-    spent: 145000,
-    items: [
-      { name: 'Project Lead (18 months FTE)', budgeted: 150000, spent: 62500 },
-      { name: 'Systems Engineer (15 months FTE)', budgeted: 125000, spent: 52000 },
-      { name: 'Research Analyst (18 months 0.5 FTE)', budgeted: 45000, spent: 18750 },
-      { name: 'Industry Liaison (12 months 0.5 FTE)', budgeted: 30000, spent: 11750 },
-    ]
-  },
-  {
-    name: 'Infrastructure & Technology',
-    budgeted: 30000,
-    spent: 8500,
-    items: [
-      { name: 'Cloud Hosting (12 months)', budgeted: 22000, spent: 5500 },
-      { name: 'Software Licenses', budgeted: 6500, spent: 2500 },
-      { name: 'API Services', budgeted: 1500, spent: 500 },
-    ]
-  },
-  {
-    name: 'Participant Incentives',
-    budgeted: 20000,
-    spent: 3200,
-    items: [
-      { name: 'Standard Participant Stipends', budgeted: 15000, spent: 2400 },
-      { name: 'Case Study Compensation', budgeted: 5000, spent: 800 },
-    ]
-  },
-  {
-    name: 'Publication & Dissemination',
-    budgeted: 10000,
-    spent: 1200,
-    items: [
-      { name: 'Open Access Fees', budgeted: 4000, spent: 0 },
-      { name: 'Conference Attendance', budgeted: 5000, spent: 1000 },
-      { name: 'Materials & Printing', budgeted: 1000, spent: 200 },
-    ]
-  }
-];
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { DollarSign, Users, TrendingUp, Plus, Loader2 } from "lucide-react";
+import { useBudgetItems, CreateBudgetInput } from "@/hooks/useBudgetItems";
+import { useState } from "react";
 
 const formatCurrency = (amount: number) => {
   return new Intl.NumberFormat('en-US', {
@@ -64,22 +20,103 @@ const formatCurrency = (amount: number) => {
   }).format(amount);
 };
 
+const CATEGORIES = ['Personnel', 'Infrastructure & Technology', 'Participant Incentives', 'Publication & Dissemination'];
+
 export function BudgetResourceTracker() {
-  const totalBudget = budgetData.reduce((sum, cat) => sum + cat.budgeted, 0);
-  const totalSpent = budgetData.reduce((sum, cat) => sum + cat.spent, 0);
+  const { items, groupedByCategory, isLoading, stats, createItem, updateItem } = useBudgetItems();
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [newItem, setNewItem] = useState<CreateBudgetInput>({
+    category: 'Personnel',
+    item_name: '',
+    budgeted_amount: 0,
+  });
+
+  const handleCreateItem = () => {
+    if (!newItem.item_name || newItem.budgeted_amount <= 0) return;
+    createItem.mutate(newItem, {
+      onSuccess: () => {
+        setIsDialogOpen(false);
+        setNewItem({ category: 'Personnel', item_name: '', budgeted_amount: 0 });
+      }
+    });
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardContent className="flex items-center justify-center py-12">
+          <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const totalBudget = stats.totalBudgeted || 410000; // Fallback to PRP default if empty
+  const totalSpent = stats.totalSpent;
   const totalRemaining = totalBudget - totalSpent;
-  const overallProgress = (totalSpent / totalBudget) * 100;
+  const overallProgress = totalBudget > 0 ? (totalSpent / totalBudget) * 100 : 0;
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <DollarSign className="h-5 w-5" />
-          Budget & Resource Tracker
-        </CardTitle>
-        <CardDescription>
-          Per PRP Section 6 - Total Budget: {formatCurrency(totalBudget)}
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <DollarSign className="h-5 w-5" />
+              Budget & Resource Tracker
+            </CardTitle>
+            <CardDescription>
+              Per PRP Section 6 - Total Budget: {formatCurrency(totalBudget)}
+            </CardDescription>
+          </div>
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm">
+                <Plus className="h-4 w-4 mr-1" />
+                Add Item
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Add Budget Item</DialogTitle>
+              </DialogHeader>
+              <div className="space-y-4 pt-4">
+                <Select
+                  value={newItem.category}
+                  onValueChange={(v) => setNewItem({ ...newItem, category: v })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {CATEGORIES.map((cat) => (
+                      <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input
+                  placeholder="Item name"
+                  value={newItem.item_name}
+                  onChange={(e) => setNewItem({ ...newItem, item_name: e.target.value })}
+                />
+                <Input
+                  type="number"
+                  placeholder="Budgeted amount"
+                  value={newItem.budgeted_amount || ''}
+                  onChange={(e) => setNewItem({ ...newItem, budgeted_amount: Number(e.target.value) })}
+                />
+                <Input
+                  placeholder="Description (optional)"
+                  value={newItem.description || ''}
+                  onChange={(e) => setNewItem({ ...newItem, description: e.target.value })}
+                />
+                <Button onClick={handleCreateItem} disabled={createItem.isPending} className="w-full">
+                  {createItem.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Add Item'}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Summary Cards */}
@@ -117,71 +154,90 @@ export function BudgetResourceTracker() {
           </TabsList>
 
           <TabsContent value="overview" className="space-y-4">
-            {budgetData.map((category) => {
-              const progress = (category.spent / category.budgeted) * 100;
-              const isOverBudget = progress > 100;
-              const isNearLimit = progress > 80 && progress <= 100;
-              
-              return (
-                <div key={category.name} className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{category.name}</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm text-muted-foreground">
-                        {formatCurrency(category.spent)} / {formatCurrency(category.budgeted)}
-                      </span>
-                      {isOverBudget && (
-                        <Badge variant="destructive">Over Budget</Badge>
-                      )}
-                      {isNearLimit && (
-                        <Badge variant="outline" className="bg-amber-500/10 text-amber-600">Near Limit</Badge>
-                      )}
+            {items.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">
+                No budget items yet. Add items to track spending.
+              </div>
+            ) : (
+              stats.categoryTotals.map((cat) => {
+                const progress = cat.budgeted > 0 ? (cat.spent / cat.budgeted) * 100 : 0;
+                const isOverBudget = progress > 100;
+                const isNearLimit = progress > 80 && progress <= 100;
+                
+                return (
+                  <div key={cat.category} className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium">{cat.category}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm text-muted-foreground">
+                          {formatCurrency(cat.spent)} / {formatCurrency(cat.budgeted)}
+                        </span>
+                        {isOverBudget && (
+                          <Badge variant="destructive">Over Budget</Badge>
+                        )}
+                        {isNearLimit && (
+                          <Badge variant="outline" className="bg-amber-500/10 text-amber-600">Near Limit</Badge>
+                        )}
+                      </div>
                     </div>
+                    <Progress
+                      value={Math.min(progress, 100)}
+                      className={`h-2 ${isOverBudget ? '[&>div]:bg-destructive' : isNearLimit ? '[&>div]:bg-amber-500' : ''}`}
+                    />
                   </div>
-                  <Progress
-                    value={Math.min(progress, 100)}
-                    className={`h-2 ${isOverBudget ? '[&>div]:bg-destructive' : isNearLimit ? '[&>div]:bg-amber-500' : ''}`}
-                  />
-                </div>
-              );
-            })}
+                );
+              })
+            )}
           </TabsContent>
 
-          {budgetData.map((category, idx) => (
-            <TabsContent key={category.name} value={['overview', 'personnel', 'infrastructure', 'incentives', 'publication'][idx + 1]}>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Item</TableHead>
-                    <TableHead className="text-right">Budgeted</TableHead>
-                    <TableHead className="text-right">Spent</TableHead>
-                    <TableHead className="text-right">Remaining</TableHead>
-                    <TableHead className="text-right">Progress</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {category.items.map((item) => {
-                    const progress = (item.spent / item.budgeted) * 100;
-                    return (
-                      <TableRow key={item.name}>
-                        <TableCell className="font-medium">{item.name}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(item.budgeted)}</TableCell>
-                        <TableCell className="text-right">{formatCurrency(item.spent)}</TableCell>
-                        <TableCell className="text-right text-muted-foreground">
-                          {formatCurrency(item.budgeted - item.spent)}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Badge variant={progress > 80 ? "outline" : "secondary"} className={progress > 80 ? "bg-amber-500/10 text-amber-600" : ""}>
-                            {progress.toFixed(0)}%
-                          </Badge>
-                        </TableCell>
+          {CATEGORIES.map((category, idx) => {
+            const categoryItems = groupedByCategory[category] || [];
+            const tabValue = ['overview', 'personnel', 'infrastructure', 'incentives', 'publication'][idx + 1];
+            
+            return (
+              <TabsContent key={category} value={tabValue}>
+                {categoryItems.length === 0 ? (
+                  <div className="text-center py-8 text-muted-foreground">
+                    No items in this category yet.
+                  </div>
+                ) : (
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Item</TableHead>
+                        <TableHead className="text-right">Budgeted</TableHead>
+                        <TableHead className="text-right">Spent</TableHead>
+                        <TableHead className="text-right">Remaining</TableHead>
+                        <TableHead className="text-right">Progress</TableHead>
                       </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </TabsContent>
-          ))}
+                    </TableHeader>
+                    <TableBody>
+                      {categoryItems.map((item) => {
+                        const progress = item.budgeted_amount > 0 
+                          ? (item.spent_amount / item.budgeted_amount) * 100 
+                          : 0;
+                        return (
+                          <TableRow key={item.id}>
+                            <TableCell className="font-medium">{item.item_name}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(item.budgeted_amount)}</TableCell>
+                            <TableCell className="text-right">{formatCurrency(item.spent_amount)}</TableCell>
+                            <TableCell className="text-right text-muted-foreground">
+                              {formatCurrency(item.budgeted_amount - item.spent_amount)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <Badge variant={progress > 80 ? "outline" : "secondary"} className={progress > 80 ? "bg-amber-500/10 text-amber-600" : ""}>
+                                {progress.toFixed(0)}%
+                              </Badge>
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                )}
+              </TabsContent>
+            );
+          })}
         </Tabs>
 
         {/* Funding Sources */}
