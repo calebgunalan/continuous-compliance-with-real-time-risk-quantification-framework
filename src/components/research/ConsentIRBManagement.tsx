@@ -5,30 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
 import { 
-  FileCheck, 
-  Shield, 
-  Users, 
-  Download, 
-  CheckCircle2, 
-  Clock, 
-  AlertTriangle,
-  FileText,
-  Lock
+  FileCheck, Shield, Download, CheckCircle2, Clock, AlertTriangle, FileText, Lock, Plus
 } from "lucide-react";
 import { toast } from "sonner";
-
-interface ConsentRecord {
-  organizationId: string;
-  organizationName: string;
-  signedDate: string | null;
-  signatoryName: string | null;
-  signatoryTitle: string | null;
-  consentVersion: string;
-  dataUseApproved: boolean;
-  publicationApproved: boolean;
-  withdrawalDate: string | null;
-}
+import { useConsentRecords } from "@/hooks/useConsentRecords";
 
 interface IRBChecklist {
   id: string;
@@ -37,53 +23,6 @@ interface IRBChecklist {
   status: 'complete' | 'in_progress' | 'pending';
   notes?: string;
 }
-
-const mockConsents: ConsentRecord[] = [
-  {
-    organizationId: 'org-001',
-    organizationName: 'Acme Financial Services',
-    signedDate: '2026-01-05',
-    signatoryName: 'John Smith',
-    signatoryTitle: 'CISO',
-    consentVersion: '1.2',
-    dataUseApproved: true,
-    publicationApproved: true,
-    withdrawalDate: null
-  },
-  {
-    organizationId: 'org-002',
-    organizationName: 'HealthFirst Medical',
-    signedDate: '2026-01-08',
-    signatoryName: 'Sarah Johnson',
-    signatoryTitle: 'VP Security',
-    consentVersion: '1.2',
-    dataUseApproved: true,
-    publicationApproved: true,
-    withdrawalDate: null
-  },
-  {
-    organizationId: 'org-003',
-    organizationName: 'TechStart Inc',
-    signedDate: '2026-01-10',
-    signatoryName: 'Mike Chen',
-    signatoryTitle: 'CTO',
-    consentVersion: '1.2',
-    dataUseApproved: true,
-    publicationApproved: false,
-    withdrawalDate: null
-  },
-  {
-    organizationId: 'org-004',
-    organizationName: 'Manufacturing Corp',
-    signedDate: null,
-    signatoryName: null,
-    signatoryTitle: null,
-    consentVersion: '1.2',
-    dataUseApproved: false,
-    publicationApproved: false,
-    withdrawalDate: null
-  }
-];
 
 const irbChecklist: IRBChecklist[] = [
   { id: 'irb-1', category: 'Documentation', item: 'Study protocol document finalized', status: 'complete' },
@@ -107,7 +46,7 @@ Principal Investigator: [PI Name], [Institution]
 IRB Protocol Number: [Protocol Number]
 
 PURPOSE OF THE STUDY
-You are being invited to participate in a research study examining the relationship between compliance governance maturity and quantified security risk reduction. The study aims to validate whether continuous compliance monitoring reduces breach probability proportionally to governance maturity level.
+You are being invited to participate in a research study examining the relationship between compliance governance maturity and quantified security risk reduction.
 
 WHAT PARTICIPATION INVOLVES
 If you agree to participate, your organization will:
@@ -117,14 +56,6 @@ If you agree to participate, your organization will:
 4. Complete quarterly surveys
 5. Report any security incidents during the study period
 
-DATA COLLECTION
-We will collect:
-- Compliance control test results (automated, continuous)
-- Security configuration snapshots
-- Maturity assessment scores (monthly)
-- Security incident reports (if any occur)
-- Survey and interview responses
-
 CONFIDENTIALITY
 All organizational data will be:
 - Encrypted at rest and in transit
@@ -132,37 +63,22 @@ All organizational data will be:
 - Accessible only to the research team
 - Deleted after the retention period (5 years post-study)
 
-RISKS AND BENEFITS
-Risks: Minimal risk of data breach (mitigated by encryption and access controls)
-Benefits: Free access to continuous compliance tools, quantified risk metrics, industry benchmarks
-
 VOLUNTARY PARTICIPATION
 Participation is voluntary. You may withdraw at any time without penalty.
 
-CONTACT INFORMATION
-Questions: [PI Email]
-IRB Concerns: [IRB Office Contact]
-
-CONSENT
-By signing below, you confirm that you have read and understood this consent form and agree to participate in this research study.
-
 Organization: _______________________
 Authorized Signatory: _______________________
-Title: _______________________
-Signature: _______________________
 Date: _______________________`;
 
 export function ConsentIRBManagement() {
-  const [consents] = useState<ConsentRecord[]>(mockConsents);
+  const { consents, isLoading, stats, createConsent, revokeConsent } = useConsentRecords();
   const [checklist] = useState<IRBChecklist[]>(irbChecklist);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [newConsent, setNewConsent] = useState({ signed_by: '', consent_type: 'participation', consent_version: '1.2' });
 
-  const signedCount = consents.filter(c => c.signedDate).length;
-  const pendingCount = consents.filter(c => !c.signedDate).length;
-  const publicationApprovedCount = consents.filter(c => c.publicationApproved).length;
-
+  const publicationApprovedCount = consents.filter(c => c.consent_type === 'publication' && c.is_active).length;
   const completeItems = checklist.filter(c => c.status === 'complete').length;
-  const totalItems = checklist.length;
-  const complianceScore = Math.round((completeItems / totalItems) * 100);
+  const complianceScore = Math.round((completeItems / checklist.length) * 100);
 
   const getStatusBadge = (status: IRBChecklist['status']) => {
     switch (status) {
@@ -183,29 +99,70 @@ export function ConsentIRBManagement() {
     toast.success("Consent template downloaded");
   };
 
+  const handleCreateConsent = () => {
+    if (!newConsent.signed_by) { toast.error("Signatory name is required"); return; }
+    createConsent.mutate(newConsent, {
+      onSuccess: () => {
+        setDialogOpen(false);
+        setNewConsent({ signed_by: '', consent_type: 'participation', consent_version: '1.2' });
+      }
+    });
+  };
+
+  if (isLoading) {
+    return <Card><CardContent className="p-6"><Skeleton className="h-64 w-full" /></CardContent></Card>;
+  }
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <FileCheck className="h-5 w-5" />
-          Consent & IRB Management
-        </CardTitle>
-        <CardDescription>
-          Per PRP Section 8 - Ethical considerations and informed consent tracking
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <FileCheck className="h-5 w-5" />
+              Consent & IRB Management
+            </CardTitle>
+            <CardDescription>Per PRP Section 8 - Ethical considerations and informed consent tracking</CardDescription>
+          </div>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm"><Plus className="h-4 w-4 mr-1" />Add Consent</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Record New Consent</DialogTitle></DialogHeader>
+              <div className="space-y-4">
+                <div><Label>Signed By</Label><Input value={newConsent.signed_by} onChange={e => setNewConsent(p => ({ ...p, signed_by: e.target.value }))} placeholder="Name of signatory" /></div>
+                <div><Label>Consent Type</Label>
+                  <Select value={newConsent.consent_type} onValueChange={v => setNewConsent(p => ({ ...p, consent_type: v }))}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="participation">Participation</SelectItem>
+                      <SelectItem value="data_use">Data Use</SelectItem>
+                      <SelectItem value="publication">Publication</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div><Label>Version</Label><Input value={newConsent.consent_version} onChange={e => setNewConsent(p => ({ ...p, consent_version: e.target.value }))} /></div>
+                <Button onClick={handleCreateConsent} disabled={createConsent.isPending} className="w-full">
+                  {createConsent.isPending ? "Saving..." : "Record Consent"}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Summary Stats */}
         <div className="grid grid-cols-4 gap-4">
           <div className="bg-emerald-500/10 rounded-lg p-4 text-center">
             <CheckCircle2 className="h-6 w-6 mx-auto text-emerald-600 mb-1" />
-            <div className="text-2xl font-bold text-emerald-600">{signedCount}</div>
-            <div className="text-xs text-muted-foreground">Consents Signed</div>
+            <div className="text-2xl font-bold text-emerald-600">{stats.active}</div>
+            <div className="text-xs text-muted-foreground">Active Consents</div>
           </div>
           <div className="bg-amber-500/10 rounded-lg p-4 text-center">
             <Clock className="h-6 w-6 mx-auto text-amber-600 mb-1" />
-            <div className="text-2xl font-bold text-amber-600">{pendingCount}</div>
-            <div className="text-xs text-muted-foreground">Pending</div>
+            <div className="text-2xl font-bold text-amber-600">{stats.revoked}</div>
+            <div className="text-xs text-muted-foreground">Revoked</div>
           </div>
           <div className="bg-blue-500/10 rounded-lg p-4 text-center">
             <FileText className="h-6 w-6 mx-auto text-blue-600 mb-1" />
@@ -227,57 +184,46 @@ export function ConsentIRBManagement() {
           </TabsList>
 
           <TabsContent value="consents">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Organization</TableHead>
-                  <TableHead>Signed Date</TableHead>
-                  <TableHead>Signatory</TableHead>
-                  <TableHead>Data Use</TableHead>
-                  <TableHead>Publication</TableHead>
-                  <TableHead>Status</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {consents.map((consent) => (
-                  <TableRow key={consent.organizationId}>
-                    <TableCell className="font-medium">{consent.organizationName}</TableCell>
-                    <TableCell>
-                      {consent.signedDate ? new Date(consent.signedDate).toLocaleDateString() : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {consent.signatoryName ? (
-                        <div>
-                          <div className="font-medium text-sm">{consent.signatoryName}</div>
-                          <div className="text-xs text-muted-foreground">{consent.signatoryTitle}</div>
-                        </div>
-                      ) : '-'}
-                    </TableCell>
-                    <TableCell>
-                      {consent.dataUseApproved ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                      ) : (
-                        <AlertTriangle className="h-4 w-4 text-amber-500" />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {consent.publicationApproved ? (
-                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-                      ) : (
-                        <AlertTriangle className="h-4 w-4 text-amber-500" />
-                      )}
-                    </TableCell>
-                    <TableCell>
-                      {consent.signedDate ? (
-                        <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">Active</Badge>
-                      ) : (
-                        <Badge variant="outline">Pending</Badge>
-                      )}
-                    </TableCell>
+            {consents.length === 0 ? (
+              <div className="text-center py-8 text-muted-foreground">No consent records yet. Click "Add Consent" to record one.</div>
+            ) : (
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Signed By</TableHead>
+                    <TableHead>Type</TableHead>
+                    <TableHead>Version</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Actions</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+                <TableBody>
+                  {consents.map((consent) => (
+                    <TableRow key={consent.id}>
+                      <TableCell className="font-medium">{consent.signed_by}</TableCell>
+                      <TableCell><Badge variant="outline">{consent.consent_type}</Badge></TableCell>
+                      <TableCell>v{consent.consent_version}</TableCell>
+                      <TableCell>{new Date(consent.signed_at).toLocaleDateString()}</TableCell>
+                      <TableCell>
+                        {consent.is_active ? (
+                          <Badge className="bg-emerald-500/10 text-emerald-600 border-emerald-500/30">Active</Badge>
+                        ) : (
+                          <Badge className="bg-red-500/10 text-red-600 border-red-500/30">Revoked</Badge>
+                        )}
+                      </TableCell>
+                      <TableCell>
+                        {consent.is_active && (
+                          <Button variant="ghost" size="sm" onClick={() => revokeConsent.mutate({ id: consent.id, reason: 'Participant withdrawal' })}>
+                            Revoke
+                          </Button>
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            )}
           </TabsContent>
 
           <TabsContent value="irb" className="space-y-4">
@@ -291,9 +237,7 @@ export function ConsentIRBManagement() {
                       <span className="text-sm">{item.item}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      {item.notes && (
-                        <span className="text-xs text-muted-foreground">{item.notes}</span>
-                      )}
+                      {item.notes && <span className="text-xs text-muted-foreground">{item.notes}</span>}
                       {getStatusBadge(item.status)}
                     </div>
                   </div>
@@ -305,8 +249,7 @@ export function ConsentIRBManagement() {
           <TabsContent value="template" className="space-y-4">
             <div className="flex justify-end">
               <Button variant="outline" size="sm" onClick={handleDownloadTemplate}>
-                <Download className="h-4 w-4 mr-1" />
-                Download Template
+                <Download className="h-4 w-4 mr-1" />Download Template
               </Button>
             </div>
             <pre className="bg-muted/30 rounded-lg p-4 text-xs overflow-x-auto whitespace-pre-wrap max-h-[400px] overflow-y-auto">
@@ -315,24 +258,14 @@ export function ConsentIRBManagement() {
           </TabsContent>
         </Tabs>
 
-        {/* Data Security Summary */}
         <div className="border-t pt-4">
           <h4 className="font-medium mb-3 flex items-center gap-2">
-            <Lock className="h-4 w-4" />
-            Data Security Measures (PRP Section 8.3)
+            <Lock className="h-4 w-4" />Data Security Measures (PRP Section 8.3)
           </h4>
           <div className="grid grid-cols-2 gap-2">
-            {[
-              'Encryption at rest (AES-256)',
-              'Encryption in transit (TLS 1.3)',
-              'Role-based access controls',
-              'Audit logging enabled',
-              'Anonymization procedures',
-              'Secure deletion policy'
-            ].map((measure) => (
+            {['Encryption at rest (AES-256)', 'Encryption in transit (TLS 1.3)', 'Role-based access controls', 'Audit logging enabled', 'Anonymization procedures', 'Secure deletion policy'].map((measure) => (
               <div key={measure} className="flex items-center gap-2 text-sm">
-                <CheckCircle2 className="h-3 w-3 text-emerald-500" />
-                <span>{measure}</span>
+                <CheckCircle2 className="h-3 w-3 text-emerald-500" /><span>{measure}</span>
               </div>
             ))}
           </div>
