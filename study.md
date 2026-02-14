@@ -818,6 +818,21 @@ The research platform now includes 24 specialized tools with **all management co
 
 ---
 
+### Phase 18: Project Overview, Data Seeding & Realtime ✅ COMPLETE
+
+**Completed Components:**
+- [x] `seed-prp-data` edge function - Seeds milestones, budget, risks, metrics from PRP document
+- [x] Project Overview dashboard (`ProjectOverview.tsx`) - Executive summary page
+- [x] Realtime subscriptions for all 7 research tables (`useRealtimeResearchData`)
+- [x] Sidebar navigation entry and route for `/overview`
+
+**Features Implemented:**
+1. **Database Seeding** - One-click seeding of 13 milestones, 11 budget items, 10 risks, 16 success metrics from PRP
+2. **Project Overview** - Summary cards (timeline, budget, risks, metrics), donut chart, bar chart, risk scores
+3. **Realtime Subscriptions** - Live updates for project_milestones, budget_items, project_risks, success_metrics, support_tickets, consent_records, funding_applications
+
+---
+
 ## Version History
 
 | Version | Date | Changes | Author |
@@ -832,6 +847,7 @@ The research platform now includes 24 specialized tools with **all management co
 | 1.7 | 2026-01-22 | Phase 15 - Database persistence and hooks for research management | Research Team |
 | 1.8 | 2026-01-23 | Phase 16 - Connected research components to database hooks | Research Team |
 | 1.9 | 2026-02-13 | Phase 17 - Full component-database integration (Consent, Funding, Risks) | Research Team |
+| 2.0 | 2026-02-14 | Phase 18 - Project Overview dashboard, PRP data seeding, realtime subscriptions | Research Team |
 
 ---
 
