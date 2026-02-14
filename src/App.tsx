@@ -19,6 +19,7 @@ import Settings from "./pages/Settings";
 import Reports from "./pages/Reports";
 import Remediation from "./pages/Remediation";
 import ResearchValidation from "./pages/ResearchValidation";
+import ProjectOverview from "./pages/ProjectOverview";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -45,6 +46,7 @@ const App = () => (
             <Route path="/reports" element={<ProtectedRoute><Reports /></ProtectedRoute>} />
             <Route path="/remediation" element={<ProtectedRoute><Remediation /></ProtectedRoute>} />
             <Route path="/research" element={<ProtectedRoute><ResearchValidation /></ProtectedRoute>} />
+            <Route path="/overview" element={<ProtectedRoute><ProjectOverview /></ProtectedRoute>} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
