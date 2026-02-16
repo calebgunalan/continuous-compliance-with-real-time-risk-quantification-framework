@@ -6,6 +6,8 @@ import { RiskExposureChart } from "@/components/dashboard/RiskExposureChart";
 import { ControlStatusList } from "@/components/dashboard/ControlStatusList";
 import { ThreatScenarioCard } from "@/components/dashboard/ThreatScenarioCard";
 import { IndustryBenchmark } from "@/components/dashboard/IndustryBenchmark";
+import { ComplianceEntropyGauge } from "@/components/dashboard/ComplianceEntropyGauge";
+import { RiskVelocityDashboard } from "@/components/dashboard/RiskVelocityDashboard";
 import { BreachProbabilityTracker } from "@/components/dashboard/BreachProbabilityTracker";
 import { RemediationWidget } from "@/components/dashboard/RemediationWidget";
 import {
@@ -19,8 +21,10 @@ import { useAuth } from "@/hooks/useAuth";
 import { useOrganization } from "@/hooks/useOrganization";
 import { useTotalRiskExposure, useThreatScenarios } from "@/hooks/useThreatScenarios";
 import { useControlsPassRate, useOrganizationControls } from "@/hooks/useControls";
-import { useLatestMaturityAssessment, calculateProjectedRiskReduction } from "@/hooks/useRiskCalculations";
+import { useLatestMaturityAssessment, useRiskCalculations, calculateProjectedRiskReduction } from "@/hooks/useRiskCalculations";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { ControlState } from "@/lib/complianceEntropy";
+import { useMemo } from "react";
 
 const formatCurrency = (value: number): string => {
   if (value >= 1000000000) return `$${(value / 1000000000).toFixed(1)}B`;
@@ -50,6 +54,22 @@ const Index = () => {
   const { data: controls, isLoading: controlsLoading } = useOrganizationControls(organizationId);
   const { data: passRate, isLoading: passRateLoading } = useControlsPassRate(organizationId);
   const { data: maturityAssessment, isLoading: maturityLoading } = useLatestMaturityAssessment(organizationId);
+  const { data: riskHistory } = useRiskCalculations(organizationId, 30);
+
+  // Derive control states for entropy
+  const controlStates: ControlState[] = useMemo(() => 
+    (controls || []).map(c => (c.current_status as ControlState) || 'not_tested'),
+    [controls]
+  );
+
+  // Derive risk snapshots for velocity
+  const riskSnapshots = useMemo(() => 
+    (riskHistory || []).map(r => ({
+      timestamp: r.calculated_at,
+      riskExposure: r.total_risk_exposure,
+    })).reverse(),
+    [riskHistory]
+  );
 
   const isLoading = !organizationId || orgLoading || riskLoading || threatsLoading || controlsLoading || passRateLoading || maturityLoading;
 
@@ -209,6 +229,12 @@ const Index = () => {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Novel Algorithms Section */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <ComplianceEntropyGauge controlStates={controlStates} />
+        <RiskVelocityDashboard riskSnapshots={riskSnapshots} />
       </div>
 
       {/* Research & Analytics Section */}

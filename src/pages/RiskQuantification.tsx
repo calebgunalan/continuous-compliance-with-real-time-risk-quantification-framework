@@ -5,6 +5,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { WhatIfScenarioModeler } from "@/components/risk/WhatIfScenarioModeler";
 import { MonteCarloSimulation } from "@/components/risk/MonteCarloSimulation";
 import { ExecutiveReportExport } from "@/components/reports/ExecutiveReportExport";
+import { BayesianRiskTracker } from "@/components/risk/BayesianRiskTracker";
 import { useThreatScenarios } from "@/hooks/useThreatScenarios";
 import { useOrganizationContext } from "@/contexts/OrganizationContext";
 
@@ -271,6 +272,15 @@ export default function RiskQuantificationPage() {
           baseRisk={totalRiskExposure * 1000000} 
           volatility={0.35}
           iterations={10000}
+        />
+      </div>
+
+      {/* Bayesian Risk Scoring */}
+      <div className="mt-6">
+        <BayesianRiskTracker
+          industry="technology"
+          totalPasses={842}
+          totalFailures={58}
         />
       </div>
 

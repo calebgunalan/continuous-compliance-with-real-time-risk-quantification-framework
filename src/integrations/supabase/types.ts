@@ -272,6 +272,58 @@ export type Database = {
           },
         ]
       }
+      control_dependencies: {
+        Row: {
+          child_control_id: string
+          created_at: string
+          dependency_strength: number
+          dependency_type: string
+          id: string
+          organization_id: string
+          parent_control_id: string
+        }
+        Insert: {
+          child_control_id: string
+          created_at?: string
+          dependency_strength?: number
+          dependency_type?: string
+          id?: string
+          organization_id: string
+          parent_control_id: string
+        }
+        Update: {
+          child_control_id?: string
+          created_at?: string
+          dependency_strength?: number
+          dependency_type?: string
+          id?: string
+          organization_id?: string
+          parent_control_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "control_dependencies_child_control_id_fkey"
+            columns: ["child_control_id"]
+            isOneToOne: false
+            referencedRelation: "controls"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "control_dependencies_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "control_dependencies_parent_control_id_fkey"
+            columns: ["parent_control_id"]
+            isOneToOne: false
+            referencedRelation: "controls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       control_effectiveness: {
         Row: {
           breach_probability_impact: number | null

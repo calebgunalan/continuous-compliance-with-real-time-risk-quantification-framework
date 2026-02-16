@@ -8,6 +8,8 @@ import { useOrganizationControls } from "@/hooks/useControls";
 import { ControlTestRunner } from "@/components/compliance/ControlTestRunner";
 import { ScheduledTestConfig } from "@/components/compliance/ScheduledTestConfig";
 import { ControlDriftDetector } from "@/components/compliance/ControlDriftDetector";
+import { CascadeFailureAnalyzer } from "@/components/compliance/CascadeFailureAnalyzer";
+import { ComplianceAnomalyDetector } from "@/components/compliance/ComplianceAnomalyDetector";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import type { ControlStatus } from "@/types/database";
 
@@ -130,6 +132,26 @@ export default function ComplianceControlsPage() {
           <div className="animate-slide-up" style={{ animationDelay: "225ms" }}>
             <ControlDriftDetector />
           </div>
+        </div>
+      </div>
+
+      {/* Novel Algorithm Components */}
+      <div className="grid gap-6 lg:grid-cols-2 mb-6">
+        <div className="animate-slide-up" style={{ animationDelay: "240ms" }}>
+          <CascadeFailureAnalyzer
+            controls={controls.map(c => ({
+              id: c.id,
+              name: c.name,
+              passRate: c.passRate,
+              category: c.category,
+            }))}
+          />
+        </div>
+        <div className="animate-slide-up" style={{ animationDelay: "260ms" }}>
+          <ComplianceAnomalyDetector
+            organizationId={organizationId || ''}
+            controls={controls}
+          />
         </div>
       </div>
 
