@@ -10,6 +10,10 @@ import { ScheduledTestConfig } from "@/components/compliance/ScheduledTestConfig
 import { ControlDriftDetector } from "@/components/compliance/ControlDriftDetector";
 import { CascadeFailureAnalyzer } from "@/components/compliance/CascadeFailureAnalyzer";
 import { ComplianceAnomalyDetector } from "@/components/compliance/ComplianceAnomalyDetector";
+import { ComplianceDiffusionAnalyzer } from "@/components/compliance/ComplianceDiffusionAnalyzer";
+import { MarkovSteadyStatePredictor } from "@/components/compliance/MarkovSteadyStatePredictor";
+import { SpectralCoherenceAnalyzer } from "@/components/compliance/SpectralCoherenceAnalyzer";
+import { MutualInformationNetwork } from "@/components/compliance/MutualInformationNetwork";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import type { ControlStatus } from "@/types/database";
 
@@ -152,6 +156,16 @@ export default function ComplianceControlsPage() {
             organizationId={organizationId || ''}
             controls={controls}
           />
+        </div>
+      </div>
+
+      {/* Stochastic & Spectral Analysis */}
+      <div className="grid gap-6 lg:grid-cols-2 mb-6">
+        <div className="animate-slide-up" style={{ animationDelay: "280ms" }}>
+          <ComplianceDiffusionAnalyzer />
+        </div>
+        <div className="animate-slide-up" style={{ animationDelay: "300ms" }}>
+          <MutualInformationNetwork />
         </div>
       </div>
 
