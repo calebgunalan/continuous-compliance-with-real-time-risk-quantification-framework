@@ -6,6 +6,8 @@ import { WhatIfScenarioModeler } from "@/components/risk/WhatIfScenarioModeler";
 import { MonteCarloSimulation } from "@/components/risk/MonteCarloSimulation";
 import { ExecutiveReportExport } from "@/components/reports/ExecutiveReportExport";
 import { BayesianRiskTracker } from "@/components/risk/BayesianRiskTracker";
+import { ParetoFrontVisualizer } from "@/components/risk/ParetoFrontVisualizer";
+import { GameTheoreticOptimizer } from "@/components/risk/GameTheoreticOptimizer";
 import { useThreatScenarios } from "@/hooks/useThreatScenarios";
 import { useOrganizationContext } from "@/contexts/OrganizationContext";
 
@@ -282,6 +284,12 @@ export default function RiskQuantificationPage() {
           totalPasses={842}
           totalFailures={58}
         />
+      </div>
+
+      {/* Game-Theoretic & Pareto Optimization */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <GameTheoreticOptimizer />
+        <ParetoFrontVisualizer />
       </div>
 
       {/* What-If Scenario Modeling */}

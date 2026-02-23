@@ -9,6 +9,8 @@ import { IndustryBenchmark } from "@/components/dashboard/IndustryBenchmark";
 import { ComplianceEntropyGauge } from "@/components/dashboard/ComplianceEntropyGauge";
 import { RiskVelocityDashboard } from "@/components/dashboard/RiskVelocityDashboard";
 import { BreachProbabilityTracker } from "@/components/dashboard/BreachProbabilityTracker";
+import { MarkovSteadyStatePredictor } from "@/components/compliance/MarkovSteadyStatePredictor";
+import { SpectralCoherenceAnalyzer } from "@/components/compliance/SpectralCoherenceAnalyzer";
 import { RemediationWidget } from "@/components/dashboard/RemediationWidget";
 import {
   DollarSign,
@@ -235,6 +237,12 @@ const Index = () => {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <ComplianceEntropyGauge controlStates={controlStates} />
         <RiskVelocityDashboard riskSnapshots={riskSnapshots} />
+      </div>
+
+      {/* Advanced Analytics Section */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <MarkovSteadyStatePredictor />
+        <SpectralCoherenceAnalyzer />
       </div>
 
       {/* Research & Analytics Section */}
