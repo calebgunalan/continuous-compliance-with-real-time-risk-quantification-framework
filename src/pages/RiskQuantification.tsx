@@ -8,6 +8,8 @@ import { ExecutiveReportExport } from "@/components/reports/ExecutiveReportExpor
 import { BayesianRiskTracker } from "@/components/risk/BayesianRiskTracker";
 import { ParetoFrontVisualizer } from "@/components/risk/ParetoFrontVisualizer";
 import { GameTheoreticOptimizer } from "@/components/risk/GameTheoreticOptimizer";
+import { GovernanceRiskTensor } from "@/components/risk/GovernanceRiskTensor";
+import { OptimalGovernanceTrajectory } from "@/components/risk/OptimalGovernanceTrajectory";
 import { useThreatScenarios } from "@/hooks/useThreatScenarios";
 import { useOrganizationContext } from "@/contexts/OrganizationContext";
 
@@ -290,6 +292,12 @@ export default function RiskQuantificationPage() {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <GameTheoreticOptimizer />
         <ParetoFrontVisualizer />
+      </div>
+
+      {/* Phase 21: Tensor Decomposition & Optimal Control */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <GovernanceRiskTensor />
+        <OptimalGovernanceTrajectory />
       </div>
 
       {/* What-If Scenario Modeling */}
