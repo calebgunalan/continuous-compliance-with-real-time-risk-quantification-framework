@@ -12,6 +12,8 @@ import { BreachProbabilityTracker } from "@/components/dashboard/BreachProbabili
 import { MarkovSteadyStatePredictor } from "@/components/compliance/MarkovSteadyStatePredictor";
 import { SpectralCoherenceAnalyzer } from "@/components/compliance/SpectralCoherenceAnalyzer";
 import { RemediationWidget } from "@/components/dashboard/RemediationWidget";
+import { RenyiEntropySpectrum } from "@/components/dashboard/RenyiEntropySpectrum";
+import { OptimalTransportAnalyzer } from "@/components/compliance/OptimalTransportAnalyzer";
 import {
   DollarSign,
   Shield,
@@ -237,6 +239,12 @@ const Index = () => {
       <div className="mt-6 grid gap-6 lg:grid-cols-2">
         <ComplianceEntropyGauge controlStates={controlStates} />
         <RiskVelocityDashboard riskSnapshots={riskSnapshots} />
+      </div>
+
+      {/* Phase 21: Rényi Entropy & Wasserstein Transport */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <RenyiEntropySpectrum controlStates={controlStates} />
+        <OptimalTransportAnalyzer controlStates={controlStates} />
       </div>
 
       {/* Advanced Analytics Section */}

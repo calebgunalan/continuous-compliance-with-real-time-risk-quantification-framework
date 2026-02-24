@@ -14,6 +14,8 @@ import { ComplianceDiffusionAnalyzer } from "@/components/compliance/ComplianceD
 import { MarkovSteadyStatePredictor } from "@/components/compliance/MarkovSteadyStatePredictor";
 import { SpectralCoherenceAnalyzer } from "@/components/compliance/SpectralCoherenceAnalyzer";
 import { MutualInformationNetwork } from "@/components/compliance/MutualInformationNetwork";
+import { ComplianceContagionModel } from "@/components/compliance/ComplianceContagionModel";
+import { TopologicalCoverageAnalyzer } from "@/components/compliance/TopologicalCoverageAnalyzer";
 import { formatDistanceToNow, parseISO } from "date-fns";
 import type { ControlStatus } from "@/types/database";
 
@@ -166,6 +168,20 @@ export default function ComplianceControlsPage() {
         </div>
         <div className="animate-slide-up" style={{ animationDelay: "300ms" }}>
           <MutualInformationNetwork />
+        </div>
+      </div>
+
+      {/* Phase 21: Contagion & Topological Analysis */}
+      <div className="grid gap-6 lg:grid-cols-2 mb-6">
+        <div className="animate-slide-up" style={{ animationDelay: "320ms" }}>
+          <ComplianceContagionModel
+            totalControls={stats.total || 50}
+            passingControls={stats.passing || 35}
+            failingControls={stats.failing || 10}
+          />
+        </div>
+        <div className="animate-slide-up" style={{ animationDelay: "340ms" }}>
+          <TopologicalCoverageAnalyzer />
         </div>
       </div>
 
