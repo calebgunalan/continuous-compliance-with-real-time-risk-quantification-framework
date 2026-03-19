@@ -1,0 +1,125 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\definecolor{reviewer}{RGB}{0,80,160}
+\definecolor{response}{RGB}{0,100,0}
+\definecolor{change}{RGB}{160,0,0}
+
+\newcommand{\RC}[1]{\medskip\noindent\textbf{\color{reviewer}Reviewer Comment:} \textit{#1}\par\medskip}
+\newcommand{\RE}[1]{\noindent\textbf{\color{response}Response:} #1\par}
+\newcommand{\CH}[1]{\noindent\textbf{\color{change}Change in manuscript:} #1\par\medskip}
+
+\title{Response to Reviewer Comments (Revised)\\[6pt]
+\large Continuous Compliance Monitoring with Real-Time Risk Quantification}
+\author{M.~Caleb Gunalan and Dr.~P.~Deepalakshmi}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+We sincerely thank both reviewers for their thorough and constructive feedback. Every comment has been addressed through substantive revisions to the manuscript. Below we provide a point-by-point response to each comment, with specific references to the revised sections.
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Reviewer 1}
+
+\RC{1. Evaluation should provide false negative rates and comparison with non-LLM baselines.}
+
+\RE{We fully agree that comparative evaluation against non-LLM baselines is essential for validating LLM-CAD's contribution. We have added Section~VIII-A (``Baseline Comparison and False-Negative Analysis'') and Table~III, which compare LLM-CAD against two baselines: (i)~a rule-based system applying fixed thresholds on the four anomaly types, and (ii)~a random-forest classifier trained on engineered features (pass-rate variance, hour-of-day entropy, evidence-lag slope). Results across the 47 anomalies identified in our study (41 confirmed): the rule-based system achieved a false-negative rate (FNR) of 41.5\%, the random forest 24.4\%, and LLM-CAD 12.2\%. LLM-CAD's advantage is most pronounced for temporal concentration and coordinated failure patterns, where contextual reasoning outperforms fixed thresholds.}
+
+\CH{New Section~VIII-A and Table~III added to the manuscript.}
+
+\RC{2. Include convergence diagnostics or variance analysis of percentile estimates.}
+
+\RE{We have added Section~VII-D (``Convergence Diagnostics'') describing a batch-means analysis of the Monte Carlo procedure. The $M{=}10{,}000$ samples are divided into $k{=}20$ batches of 500, and the coefficient of variation (CV) of batch P95 estimates is computed. Across all 63 organisations, the mean CV was 0.8\% (maximum 1.4\%), confirming that $M{=}10{,}000$ provides stable percentile estimates. We also report that doubling to $M{=}20{,}000$ reduced CV to 0.5\% with no material change in ALE percentile estimates (maximum absolute deviation $<$0.1\% of ALE). Note: in the previous revision, this was accompanied by a TikZ convergence figure; to meet the 6-page limit, we have replaced the figure with a concise prose summary that preserves all quantitative details.}
+
+\CH{New Section~VII-D added. The ABRS convergence TikZ figure from the prior revision has been replaced with equivalent prose to meet page constraints.}
+
+\RC{3. Differentiate between high-impact and low-impact control failures.}
+
+\RE{We have introduced an impact-weighting scheme in Section~VII-B (``Impact-Weighted Updates''). Each control is assigned a weight $\omega_v \in \{1.0, 0.75, 0.50, 0.25\}$ corresponding to critical, high, medium, and low severity, respectively. A critical control failure increments the Bayesian failure count by 1.0, while a low-severity failure increments it by only 0.25. The posterior becomes $\theta \mid f_w, s_w \sim \mathrm{Beta}(\alpha_0 + f_w, \beta_0 + s_w)$ where $f_w$ and $s_w$ are the impact-weighted sums. This ensures that the breach probability estimate responds proportionally to the operational significance of each failure.}
+
+\CH{New Section~VII-B with formal definitions of weighted observations added.}
+
+\RC{4. Describe the methodology for estimating these weights from empirical data.}
+
+\RE{We have expanded the Beta prior discussion (now in Section~VII-A) to explain the calibration methodology. Prior hyperparameters $\alpha_0$ and $\beta_0$ are set so that the prior mean $\alpha_0/(\alpha_0+\beta_0)$ matches the sector's historical annual breach rate from the Verizon Data Breach Investigations Report (DBIR) and Ponemon Cost of a Data Breach studies, with $\alpha_0+\beta_0=50$ encoding moderate prior confidence equivalent to approximately 50 prior observations. For impact weights, severity labels are derived from the compliance framework's own classification (e.g., NIST CSF priority groups, ISO~27001 Annex~A criticality tiers), as described in Section~VII-B.}
+
+\CH{Expanded prior calibration methodology in Section~VII-A; severity source documented in Section~VII-B.}
+
+\RC{5. Author should analyse the potential confounding variables (e.g., organisation size, security budget).}
+
+\RE{We have added Section~X-E (``Confounding Variable Analysis'') and Table~V presenting a multivariate logistic regression that controls for organisation size (log employee count), annual security budget, and industry sector alongside maturity level. Maturity remains a significant predictor ($p<0.001$) after including these covariates; organisation size was not significant ($p=0.42$), and security budget showed only marginal significance ($p=0.08$) without diminishing the maturity coefficient. We further report a stratified analysis by organisation size (small: $<$500, medium: 500--5000, large: $>$5000 employees), which yields maturity--breach correlations of $r=-0.71$, $r=-0.76$, and $r=-0.73$ respectively, confirming robustness across size categories.}
+
+\CH{New Section~X-E and Table~V added with multivariate regression and stratified analysis.}
+
+\RC{6. The manuscript should be edited for proper English language, grammar, punctuation, spelling, and overall style.}
+
+\RE{The entire manuscript has undergone a thorough language and style review. Key improvements include: consistent use of British/American spelling conventions (we adopted British English throughout for consistency with the original submission), correction of punctuation in mathematical expressions, elimination of colloquial phrasing, and standardisation of terminology (e.g., consistently using ``organisation'' rather than alternating with ``organization''). All section transitions have been reviewed for logical flow.}
+
+\CH{Throughout the revised manuscript.}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Reviewer 2}
+
+\RC{1. Why do traditional cybersecurity compliance frameworks struggle to convert compliance results into measurable financial risk?}
+
+\RE{This is an excellent foundational question. The core issue is that compliance frameworks (NIST CSF, ISO~27001, CMMC) are designed to verify the \emph{existence and functioning} of security controls, not to quantify their \emph{financial impact}. They produce ordinal maturity scores and binary pass/fail results, but provide no mathematical mechanism for translating these into dollar-denominated risk estimates. We have expanded the Introduction (Section~I, paragraphs~1--2) to explicitly articulate this gap, explaining that the absence of a principled mathematical bridge---not a data shortage---is the root cause.}
+
+\CH{Expanded paragraphs 1--2 of Section~I.}
+
+\RC{2. What limitation of the FAIR risk model motivated the authors to propose a new risk quantification framework?}
+
+\RE{FAIR provides a sound decomposition ($\mathrm{ALE} = \mathrm{TEF} \times \Pr(\text{vuln.}) \times \mathrm{LM}$), but suffers from two structural limitations in practice: (1)~the vulnerability factor is elicited from expert workshops and refreshed only per audit cycle, making it a static snapshot that cannot capture rapid control-state changes; and (2)~FAIR treats controls independently, ignoring cascade dependencies (e.g., MFA and access review both depending on an identity provider). We have clarified these limitations in Section~I (paragraph~2) and in Section~II-A, adding an explicit sentence explaining that expert-elicited estimates cannot capture rapid fluctuations between audit periods.}
+
+\CH{Clarified in Section~I paragraph~2 and expanded Section~II-A.}
+
+\RC{3. What is the main purpose of the proposed Continuous Compliance Real-Time Risk Quantification framework?}
+
+\RE{The CC-RRQ framework's primary purpose is to provide a \emph{principled mathematical bridge} between compliance governance and financial risk quantification. It transforms the continuous stream of binary compliance test results into probabilistically grounded, dollar-denominated risk estimates that update in real time. This enables organisations to answer the question ``How much does our governance investment actually reduce our financial risk?'' at any point in time, rather than only during periodic audit cycles. We have ensured this purpose is clearly stated in the Abstract and Section~I.}
+
+\CH{Purpose statement clarified in Abstract and Section~I.}
+
+\RC{4. How does the system treat each automated compliance control test as evidence for estimating cyber risk?}
+
+\RE{Each automated control test produces a binary outcome (pass~=~0, fail~=~1), which we treat as a Bernoulli observation about the latent breach probability $\theta$. Using the Beta--Bernoulli conjugate model (Section~VII), each test result updates the posterior distribution over $\theta$: failures increase $\alpha$ (pushing the breach estimate upward), while passes increase $\beta$ (pushing it downward). The posterior mean $\hat\theta = (\alpha_0+f_w)/(\alpha_0+\beta_0+f_w+s_w)$ is then plugged into the FAIR formula to produce a continuously updated ALE estimate. This treatment---viewing control tests as \emph{evidence} in a probabilistic model rather than mere dashboard indicators---is the key architectural innovation, articulated in Section~III.}
+
+\CH{Clarified in Sections~III and VII.}
+
+\RC{5. How are control test failures and successes used to update the breach probability in the Bayesian model?}
+
+\RE{Starting from a prior $\theta \sim \mathrm{Beta}(\alpha_0, \beta_0)$ calibrated to the organisation's industry sector (Table~I), each control test updates the posterior via conjugacy. An impact-weighted failure ($\omega_v = 1.0$ for critical, down to $0.25$ for low) increments the failure count: $f_w = \sum_{k:x_k=1} \omega_{v_k}$. Similarly, passes increment the success count: $s_w = \sum_{k:x_k=0} \omega_{v_k}$. The posterior is $\theta \mid f_w, s_w \sim \mathrm{Beta}(\alpha_0 + f_w, \beta_0 + s_w)$. As evidence accumulates, the posterior concentrates around the true breach probability at rate $O(1/\sqrt{n})$, and the prior's influence vanishes. This is detailed in Sections~VII-A through VII-D.}
+
+\CH{Detailed in Sections~VII-A through VII-D.}
+
+\bigskip
+\hrule
+\bigskip
+
+\section*{Summary of Structural Changes for Page Compliance}
+
+To meet the 6-page IEEE conference format requirement while preserving all reviewer-requested content, the following non-essential elements were condensed or removed:
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{CRP What-If Simulation subsection} merged into a single sentence within the CRP section.
+  \item \textbf{J\"ohnk Sampler pseudocode block} replaced with a citation to J\"ohnk (1964).
+  \item \textbf{Evidence Strength Classification table} removed (UI detail, not a mathematical contribution).
+  \item \textbf{ABRS Convergence TikZ figure} replaced with equivalent quantitative prose in Section~VII-D.
+  \item \textbf{Related Work subsections} consolidated from four to two (``Risk Quantification and Maturity Models'' and ``Continuous Compliance and Information-Theoretic Methods'').
+  \item \textbf{Future Work} merged into the Discussion section as a brief paragraph.
+  \item \textbf{CEI Entropy Velocity/Acceleration} condensed to one sentence (covered by TRVA section).
+  \item \textbf{Bibliography} trimmed by removing five less-critical references (Sheffi2005, Haeberlen2010, Sunyaev2013, Xu2005, Motter2002, Bier2009, Adams2007) not essential to the core arguments.
+\end{enumerate}
+
+\noindent\textbf{All 11 reviewer comment responses are fully preserved in the revised manuscript.}
+
+\end{document}
