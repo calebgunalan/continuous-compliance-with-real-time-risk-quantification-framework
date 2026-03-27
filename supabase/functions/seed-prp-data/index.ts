@@ -35,7 +35,15 @@ serve(async (req) => {
       { phase_name: "Phase 5: Analysis & Publication", milestone_name: "Manuscript submitted", target_date: "2027-08-31", description: "Submit to IEEE TDSC or ACM TISSEC", assigned_to: "Principal Investigator", progress_percentage: 0, status: "pending" },
     ];
 
-    const { data: mData, error: mErr } = await supabase.from("project_milestones").upsert(milestones, { onConflict: "milestone_name" }).select();
+    // Check if already seeded
+    const { count: existingCount } = await supabase.from("project_milestones").select("*", { count: "exact", head: true });
+    if (existingCount && existingCount > 0) {
+      return new Response(JSON.stringify({ success: true, message: "Already seeded", seeded: {} }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: mData, error: mErr } = await supabase.from("project_milestones").insert(milestones).select();
     if (mErr) console.error("Milestones error:", mErr);
     results.milestones = mData?.length || 0;
 
@@ -54,7 +62,7 @@ serve(async (req) => {
       { category: "Publication & Dissemination", item_name: "Conference attendance", description: "IEEE S&P, ACM CCS, RSA (2-3 events)", budgeted_amount: 8000, spent_amount: 1200, funding_source: "Internal", fiscal_year: "2026" },
     ];
 
-    const { data: bData, error: bErr } = await supabase.from("budget_items").upsert(budgetItems, { onConflict: "item_name" }).select();
+    const { data: bData, error: bErr } = await supabase.from("budget_items").insert(budgetItems).select();
     if (bErr) console.error("Budget error:", bErr);
     results.budget_items = bData?.length || 0;
 
@@ -72,7 +80,7 @@ serve(async (req) => {
       { risk_category: "Timeline", risk_name: "Scope creep", description: "Interesting additional questions or features expand beyond initial boundaries", likelihood: 4, impact: 3, mitigation_strategy: "Disciplined prioritization; clear essential vs optional distinction; regular scope reviews", contingency_plan: "Defer to future work; document ideas for follow-on studies", owner: "Principal Investigator", status: "monitoring" },
     ];
 
-    const { data: rData, error: rErr } = await supabase.from("project_risks").upsert(risks, { onConflict: "risk_name" }).select();
+    const { data: rData, error: rErr } = await supabase.from("project_risks").insert(risks).select();
     if (rErr) console.error("Risks error:", rErr);
     results.project_risks = rData?.length || 0;
 
@@ -96,7 +104,7 @@ serve(async (req) => {
       { category: "Academic", metric_name: "Educational adoption", description: "5+ universities use materials in courses", target_value: 5, current_value: 0, unit: "universities", measurement_method: "Usage tracking", status: "pending" },
     ];
 
-    const { data: sData, error: sErr } = await supabase.from("success_metrics").upsert(metrics, { onConflict: "metric_name" }).select();
+    const { data: sData, error: sErr } = await supabase.from("success_metrics").insert(metrics).select();
     if (sErr) console.error("Metrics error:", sErr);
     results.success_metrics = sData?.length || 0;
 
