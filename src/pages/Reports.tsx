@@ -3,6 +3,7 @@ import { PDFReportGenerator } from "@/components/reports/PDFReportGenerator";
 import { ExecutiveReportExport } from "@/components/reports/ExecutiveReportExport";
 import { ComplianceSummaryReport } from "@/components/reports/ComplianceSummaryReport";
 import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
+import { ProjectStatusPDFReport } from "@/components/reports/ProjectStatusPDFReport";
 import { FileText, Download, Calendar, BarChart3 } from "lucide-react";
 
 export default function Reports() {
