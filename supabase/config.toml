@@ -19,7 +19,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.seed-prp-data]
-verify_jwt = true
+verify_jwt = false
 
 [functions.detect-anomalies]
 verify_jwt = false

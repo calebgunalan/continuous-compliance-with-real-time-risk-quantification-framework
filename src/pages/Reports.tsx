@@ -3,6 +3,7 @@ import { PDFReportGenerator } from "@/components/reports/PDFReportGenerator";
 import { ExecutiveReportExport } from "@/components/reports/ExecutiveReportExport";
 import { ComplianceSummaryReport } from "@/components/reports/ComplianceSummaryReport";
 import { ScheduledReportsManager } from "@/components/reports/ScheduledReportsManager";
+import { ProjectStatusPDFReport } from "@/components/reports/ProjectStatusPDFReport";
 import { FileText, Download, Calendar, BarChart3 } from "lucide-react";
 
 export default function Reports() {
@@ -73,6 +74,9 @@ export default function Reports() {
           <PDFReportGenerator />
           <ExecutiveReportExport />
         </div>
+
+        {/* Project Status Report */}
+        <ProjectStatusPDFReport />
 
         {/* Additional Reports */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
